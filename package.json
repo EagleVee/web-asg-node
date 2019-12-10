@@ -1,0 +1,37 @@
+{
+  "name": "figello",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec babel-node App.js",
+    "start-devtool": "nodemon --inspect --exec babel-node App.js",
+    "start-local": "ENVIRONMENT=local nodemon --exec babel-node App.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EagleVee/figello.git"
+  },
+  "author": "Figello",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EagleVee/figello/issues"
+  },
+  "homepage": "https://github.com/EagleVee/figello#readme",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.0.0",
+    "cors": "^2.8.5",
+    "create-react-app": "^3.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.7.7",
+    "nodemon": "^1.19.3",
+    "standard": "^14.3.1"
+  }
+}
