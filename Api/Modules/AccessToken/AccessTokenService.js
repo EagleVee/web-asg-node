@@ -1,14 +1,14 @@
-import Repository from './AccessTokenRepository'
+import Repository from "./AccessTokenRepository";
 
-const create = async (data) => {
+const create = async data => {
   if (!data || !data.user || !data.jwt_token || !data.expired_at) {
-    throw new Error('Missing input')
+    throw new Error("Missing input");
   }
 
-  return Repository.create(data)
-}
+  return Repository.create(data);
+};
 const service = {
   create
-}
+};
 
-export default service
+export default service;

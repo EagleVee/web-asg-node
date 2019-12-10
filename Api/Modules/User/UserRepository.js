@@ -1,77 +1,80 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-const UserSchema = mongoose.Schema({
-  first_name: {
-    type: String,
-    required: true
+const UserSchema = mongoose.Schema(
+  {
+    first_name: {
+      type: String,
+      required: true
+    },
+    last_name: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    avatar: {
+      type: String
+    },
+    role: {
+      type: String,
+      default: "user"
+    }
   },
-  last_name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  avatar: {
-    type: String
-  },
-  role: {
-    type: String,
-    default: 'user'
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at"
+    }
   }
-}, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  }
-})
+);
 
-const UserModel = mongoose.model('User', UserSchema)
+const UserModel = mongoose.model("User", UserSchema);
 
-const find = async (query) => {
-  const { paginate, page } = query
+const find = async query => {
+  const { paginate, page } = query;
   if (paginate && page !== undefined) {
-    const limit = Number(paginate)
-    const skip = (Number(page) - 1) * Number(paginate)
-    delete query.paginate
-    delete query.page
+    const limit = Number(paginate);
+    const skip = (Number(page) - 1) * Number(paginate);
+    delete query.paginate;
+    delete query.page;
     return UserModel.find(query)
       .limit(limit)
-      .skip(skip)
+      .skip(skip);
   } else {
-    return UserModel.find(query)
+    return UserModel.find(query);
   }
-}
+};
 
-const count = async (query) => {
-  return UserModel.count(query)
-}
+const count = async query => {
+  return UserModel.count(query);
+};
 
-const findById = async (id) => {
-  return UserModel.findById(id)
-}
+const findById = async id => {
+  return UserModel.findById(id);
+};
 
-const findByEmail = async (email) => {
-  return UserModel.findOne({ email: email })
-}
+const findByEmail = async email => {
+  return UserModel.findOne({ email: email });
+};
 
-const create = async (data) => {
-  const newDocument = new UserModel(data)
-  return newDocument.save()
-}
+const create = async data => {
+  const newDocument = new UserModel(data);
+  return newDocument.save();
+};
 
 const update = async (id, data) => {
-  return UserModel.findByIdAndUpdate(id, { $set: data }, { new: true })
-}
+  return UserModel.findByIdAndUpdate(id, { $set: data }, { new: true });
+};
 
-const deleteById = async (id) => {
-  return UserModel.findByIdAndDelete(id)
-}
+const deleteById = async id => {
+  return UserModel.findByIdAndDelete(id);
+};
 
 const repository = {
   find,
@@ -81,6 +84,6 @@ const repository = {
   create,
   update,
   deleteById
-}
+};
 
-export default repository
+export default repository;

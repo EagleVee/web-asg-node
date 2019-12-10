@@ -1,18 +1,18 @@
-const success = (data) => {
+const success = data => {
   return {
     status: true,
     data: data
-  }
-}
+  };
+};
 
-const failed = (message) => {
+const failed = message => {
   return {
     status: false,
     message: message
-  }
-}
+  };
+};
 
 export default {
-  success: (data) => success(data),
-  failed: (message) => failed(message)
-}
+  success: data => success(data),
+  failed: message => failed(message)
+};
