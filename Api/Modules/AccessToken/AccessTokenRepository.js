@@ -7,11 +7,11 @@ const AccessTokenSchema = mongoose.Schema(
       required: true,
       ref: "User"
     },
-    jwt_token: {
+    jwtToken: {
       type: String,
       required: true
     },
-    expired_at: {
+    expiredAt: {
       type: Number,
       required: true
     }
@@ -35,7 +35,7 @@ const findById = async id => {
 };
 
 const findByToken = async token => {
-  return AccessTokenModel.findOne({ jwt_token: token }).populate("user");
+  return AccessTokenModel.findOne({ jwtToken: token }).populate("user");
 };
 
 const create = async data => {
@@ -49,7 +49,7 @@ const update = async (id, data) => {
 
 const updateExpireAt = async (token, expireAt) => {
   return AccessTokenModel.updateOne(
-    { jwt_token: token },
+    { jwtToken: token },
     { $set: { expired_at: expireAt } },
     { new: true }
   );

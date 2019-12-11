@@ -1,7 +1,7 @@
 import Repository from "./AccessTokenRepository";
 
 const create = async data => {
-  if (!data || !data.user || !data.jwt_token || !data.expired_at) {
+  if (!data || !data.user || !data.jwtToken || !data.expiredAt) {
     throw new Error("Missing input");
   }
 

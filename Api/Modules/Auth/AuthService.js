@@ -37,13 +37,13 @@ const login = async data => {
 
     const accessTokenData = await AccessTokenRepository.create({
       user: existedUser._id,
-      jwt_token: accessToken,
-      expired_at: expireAt
+      jwtToken: accessToken,
+      expiredAt: expireAt
     });
 
     return {
       user: existedUser,
-      access_token: accessToken
+      accessToken: accessToken
     };
   } else {
     throw new Error("You have entered wrong password!");
@@ -51,19 +51,18 @@ const login = async data => {
 };
 
 const register = async data => {
-  if (!data.email || !data.password || !data.first_name || !data.last_name) {
+  if (!data.studentId || !data.password || !data.name) {
     throw new Error("MISSING INPUT!");
   }
   const existedUser = await UserRepository.findByEmail(data.email);
   if (existedUser) {
     throw new Error("USER EXISTED!");
   }
-  const newPassword = await bcrypt.hash(data.password, SECRET_KEY);
+  const hashedPassword = await bcrypt.hash(data.password, SECRET_KEY);
   return UserRepository.create({
-    first_name: data.first_name,
-    last_name: data.last_name,
-    email: data.email,
-    password: newPassword
+    name: data.name,
+    studentId: data.studentId,
+    password: hashedPassword
   });
 };
 
@@ -72,7 +71,7 @@ const validateToken = async token => {
   if (!existedToken) {
     throw new Error("Invalid token!");
   }
-  if (existedToken.expired_at < Date.now()) {
+  if (existedToken.expiredAt < Date.now()) {
     throw new Error("Token expired!");
   }
   const newExpireDate = Date.now() + TOKEN_EXPIRE_MILLISECOND;
@@ -97,7 +96,7 @@ const logoutToken = async token => {
     newExpireDate
   );
   return {
-    logged_out: true
+    loggedOut: true
   };
 };
 
