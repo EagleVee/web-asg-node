@@ -1,5 +1,5 @@
 import Express from "express";
-import Service from "./SubjectService";
+import Service from "./ClassService";
 import ResponseJSON from "../../../Config/ResponseJSON";
 
 const Router = Express.Router();

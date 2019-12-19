@@ -1,22 +1,14 @@
 import mongoose from "mongoose";
 
-const UserSchema = mongoose.Schema(
+const RoomSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true
     },
-    password: {
-      type: String,
+    seat: {
+      type: Number,
       required: true
-    },
-    studentId: {
-      type: String,
-      required: true
-    },
-    role: {
-      type: String,
-      default: "student"
     }
   },
   {
@@ -27,7 +19,7 @@ const UserSchema = mongoose.Schema(
   }
 );
 
-const UserModel = mongoose.model("User", UserSchema);
+const RoomModel = mongoose.model("Room", RoomSchema);
 
 const find = async query => {
   const { paginate, page } = query;
@@ -36,37 +28,33 @@ const find = async query => {
     const skip = (Number(page) - 1) * Number(paginate);
     delete query.paginate;
     delete query.page;
-    return UserModel.find(query)
+    return RoomModel.find(query)
       .limit(limit)
       .skip(skip);
   } else {
-    return UserModel.find(query);
+    return RoomModel.find(query);
   }
 };
 
 const count = async query => {
-  return UserModel.count(query);
+  return RoomModel.count(query);
 };
 
 const findById = async id => {
-  return UserModel.findById(id);
-};
-
-const findByEmail = async email => {
-  return UserModel.findOne({ email: email });
+  return RoomModel.findById(id);
 };
 
 const create = async data => {
-  const newDocument = new UserModel(data);
+  const newDocument = new RoomModel(data);
   return newDocument.save();
 };
 
 const update = async (id, data) => {
-  return UserModel.findByIdAndUpdate(id, { $set: data }, { new: true });
+  return RoomModel.findByIdAndUpdate(id, { $set: data }, { new: true });
 };
 
 const deleteById = async id => {
-  return UserModel.findByIdAndDelete(id);
+  return RoomModel.findByIdAndDelete(id);
 };
 
 const repository = {

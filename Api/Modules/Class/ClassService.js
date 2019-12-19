@@ -1,4 +1,4 @@
-import Repository from "./SubjectRepository";
+import Repository from "./ClassRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 
 const find = async query => {
