@@ -16,6 +16,7 @@ const UserSchema = mongoose.Schema(
     },
     role: {
       type: String,
+      required: true,
       default: "student"
     }
   },
@@ -42,6 +43,10 @@ const find = async query => {
   } else {
     return UserModel.find(query);
   }
+};
+
+const findOne = async query => {
+  return UserModel.findOne(query);
 };
 
 const count = async query => {
@@ -71,6 +76,7 @@ const deleteById = async id => {
 
 const repository = {
   find,
+  findOne,
   findById,
   findByEmail,
   count,

@@ -1,5 +1,9 @@
 import Repository from "./UserRepository";
+import Xlsx from "node-xlsx";
+import lodash from "lodash";
+import bcrypt from "bcrypt";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
+import { SECRET_KEY } from "../../../Config";
 
 const find = async query => {
   return Repository.find(query);
@@ -10,12 +14,8 @@ const findById = async id => {
 };
 
 const create = async data => {
-  if (!data || !data.first_name || !data.last_name || !data.email) {
+  if (!data || !data.studentId) {
     throw new Error("Missing input!");
-  }
-
-  if (!validateEmail(data.email)) {
-    throw new Error("Email is not valid!");
   }
 
   return Repository.create(data);
@@ -49,13 +49,52 @@ const findByToken = async jwtToken => {
   return token.user;
 };
 
+const updateOrCreateStudent = async data => {
+  if (!data || !data.studentId) {
+    throw new Error("Missing info");
+  }
+  const existedRecord = await Repository.findOne({ studentId: data.studentId });
+  console.log(existedRecord);
+  if (!existedRecord) {
+    return Repository.create(data);
+  }
+  return Repository.update(existedRecord._id, data);
+
+};
+
+const updateStudentList = async data => {
+  const { file } = data;
+  if (!file) {
+    throw new Error("Missing file");
+  }
+  const parsedFile = Xlsx.parse(file.path);
+  let updatedStudent = [];
+  for (const sheet of parsedFile) {
+    const { data } = sheet;
+    for (const student of data) {
+      const studentId = student[1] ? student[1] : "";
+      const name = student[2] ? student[2] : "";
+      const hashedPassword = await bcrypt.hash(student[3], SECRET_KEY);
+      const studentRecord = {
+        studentId: studentId,
+        name: name,
+        password: hashedPassword
+      };
+      const newRecord = await updateOrCreateStudent(studentRecord);
+      updatedStudent.push(newRecord);
+    }
+  }
+  return updatedStudent;
+};
+
 const service = {
   find,
   findById,
   findByToken,
   create,
   update,
-  deleteByID
+  deleteByID,
+  updateStudentList
 };
 
 export default service;
