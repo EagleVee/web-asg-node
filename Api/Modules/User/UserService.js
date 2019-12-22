@@ -75,9 +75,11 @@ const updateStudentList = async data => {
       const name = student[2] ? student[2] : "";
       const hashedPassword = await bcrypt.hash(student[3], SECRET_KEY);
       const studentRecord = {
+        username: studentId,
         studentId: studentId,
         name: name,
-        password: hashedPassword
+        password: hashedPassword,
+        role: "student"
       };
       const newRecord = await updateOrCreateStudent(studentRecord);
       updatedStudent.push(newRecord);

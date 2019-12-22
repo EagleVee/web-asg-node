@@ -60,7 +60,6 @@ const deleteById = async id => {
 const repository = {
   find,
   findById,
-  findByEmail,
   count,
   create,
   update,

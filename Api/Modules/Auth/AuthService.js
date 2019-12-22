@@ -12,10 +12,10 @@ import {
 import ResponseJSON from "../../../Config/ResponseJSON";
 
 const login = async data => {
-  if (!data.email || !data.password) {
+  if (!data.username || !data.password) {
     throw new Error("Missing input!");
   }
-  const existedUser = await UserRepository.findByEmail(data.email);
+  const existedUser = await UserRepository.findOne({ username: data.username });
   if (!existedUser) {
     throw new Error("This email has not been registered!");
   }
@@ -33,7 +33,7 @@ const login = async data => {
       expiresIn: "7 days"
     });
 
-    const expireAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    const expireAt = Date.now() + TOKEN_EXPIRE_MILLISECOND;
 
     const accessTokenData = await AccessTokenRepository.create({
       user: existedUser._id,
@@ -75,14 +75,7 @@ const validateToken = async token => {
     throw new Error("Token expired!");
   }
   const newExpireDate = Date.now() + TOKEN_EXPIRE_MILLISECOND;
-  const newToken = await AccessTokenRepository.updateExpireAt(
-    token,
-    newExpireDate
-  );
-  const { user } = existedToken;
-  return {
-    user: user
-  };
+  return await AccessTokenRepository.updateExpireAt(token, newExpireDate);
 };
 
 const logoutToken = async token => {

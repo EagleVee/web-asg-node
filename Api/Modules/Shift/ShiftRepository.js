@@ -24,7 +24,7 @@ const ShiftSchema = mongoose.Schema(
   }
 );
 
-const ShiftModel = mongoose.model("Room", ShiftSchema);
+const ShiftModel = mongoose.model("Shift", ShiftSchema);
 
 const find = async query => {
   const { paginate, page } = query;

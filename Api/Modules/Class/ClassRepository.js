@@ -15,7 +15,7 @@ const ClassSchema = mongoose.Schema(
   }
 );
 
-const ClassModel = mongoose.model("User", ClassSchema);
+const ClassModel = mongoose.model("Class", ClassSchema);
 
 const find = async query => {
   const { paginate, page } = query;
@@ -40,10 +40,6 @@ const findById = async id => {
   return ClassModel.findById(id);
 };
 
-const findByEmail = async email => {
-  return ClassModel.findOne({ email: email });
-};
-
 const create = async data => {
   const newDocument = new ClassModel(data);
   return newDocument.save();
@@ -60,7 +56,6 @@ const deleteById = async id => {
 const repository = {
   find,
   findById,
-  findByEmail,
   count,
   create,
   update,

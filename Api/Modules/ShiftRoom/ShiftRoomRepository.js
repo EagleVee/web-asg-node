@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const RoomSchema = mongoose.Schema(
+const ShiftRoomSchema = mongoose.Schema(
   {
     shift: {
       type: mongoose.Schema.Types.ObjectID,
@@ -21,7 +21,7 @@ const RoomSchema = mongoose.Schema(
   }
 );
 
-const RoomModel = mongoose.model("Room", RoomSchema);
+const ShiftRoomModel = mongoose.model("ShiftRoom", ShiftRoomSchema);
 
 const find = async query => {
   const { paginate, page } = query;
@@ -30,43 +30,42 @@ const find = async query => {
     const skip = (Number(page) - 1) * Number(paginate);
     delete query.paginate;
     delete query.page;
-    return RoomModel.find(query)
+    return ShiftRoomModel.find(query)
       .limit(limit)
       .skip(skip)
       .populate("shift")
       .populate("room");
   } else {
-    return RoomModel.find(query)
+    return ShiftRoomModel.find(query)
       .populate("shift")
       .populate("room");
   }
 };
 
 const count = async query => {
-  return RoomModel.count(query);
+  return ShiftRoomModel.count(query);
 };
 
 const findById = async id => {
-  return RoomModel.findById(id);
+  return ShiftRoomModel.findById(id);
 };
 
 const create = async data => {
-  const newDocument = new RoomModel(data);
+  const newDocument = new ShiftRoomModel(data);
   return newDocument.save();
 };
 
 const update = async (id, data) => {
-  return RoomModel.findByIdAndUpdate(id, { $set: data }, { new: true });
+  return ShiftRoomModel.findByIdAndUpdate(id, { $set: data }, { new: true });
 };
 
 const deleteById = async id => {
-  return RoomModel.findByIdAndDelete(id);
+  return ShiftRoomModel.findByIdAndDelete(id);
 };
 
 const repository = {
   find,
   findById,
-  findByEmail,
   count,
   create,
   update,
