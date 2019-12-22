@@ -1,8 +1,9 @@
 import Repository from "./AccessTokenRepository";
+import ErrorHelper from "../../../Common/ErrorHelper";
 
 const create = async data => {
   if (!data || !data.user || !data.jwtToken || !data.expiredAt) {
-    throw new Error("Missing input");
+    ErrorHelper.missingInput();
   }
 
   return Repository.create(data);

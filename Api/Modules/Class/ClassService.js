@@ -10,12 +10,8 @@ const findById = async id => {
 };
 
 const create = async data => {
-  if (!data || !data.first_name || !data.last_name || !data.email) {
-    throw new Error("Missing input!");
-  }
-
-  if (!validateEmail(data.email)) {
-    throw new Error("Email is not valid!");
+  if (!data) {
+    ErrorHelper.missingInput();
   }
 
   return Repository.create(data);
@@ -24,7 +20,7 @@ const create = async data => {
 const update = async function(id, data) {
   const existedRecord = await Repository.findById(id);
   if (!existedRecord) {
-    throw new Error("Entity not found!");
+    ErrorHelper.entityNotFound();
   }
 
   return Repository.update(id, data);
@@ -33,7 +29,7 @@ const update = async function(id, data) {
 const deleteByID = async id => {
   const existedRecord = await Repository.findById(id);
   if (!existedRecord) {
-    throw new Error("Entity not found!");
+    ErrorHelper.entityNotFound();
   }
 
   return Repository.delete(id);

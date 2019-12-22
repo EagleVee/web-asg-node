@@ -13,7 +13,7 @@ import ResponseJSON from "../../../Config/ResponseJSON";
 
 const login = async data => {
   if (!data.username || !data.password) {
-    throw new Error("Missing input!");
+    ErrorHelper.missingInput();
   }
   const existedUser = await UserRepository.findOne({ username: data.username });
   if (!existedUser) {
@@ -52,7 +52,7 @@ const login = async data => {
 
 const register = async data => {
   if (!data.studentId || !data.password || !data.name) {
-    throw new Error("MISSING INPUT!");
+    ErrorHelper.missingInput();
   }
   const existedUser = await UserRepository.findByEmail(data.email);
   if (existedUser) {
