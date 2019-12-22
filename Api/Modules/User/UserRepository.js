@@ -15,8 +15,7 @@ const UserSchema = mongoose.Schema(
       required: true
     },
     studentId: {
-      type: String,
-      required: true
+      type: String
     },
     role: {
       type: String,

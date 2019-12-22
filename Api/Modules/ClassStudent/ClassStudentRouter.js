@@ -1,5 +1,5 @@
 import Express from "express";
-import Service from "./RoomService";
+import Service from "./ClassStudentService";
 import ResponseJSON from "../../../Config/ResponseJSON";
 
 const Router = Express.Router();
