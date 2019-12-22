@@ -54,7 +54,6 @@ const updateOrCreateStudent = async data => {
     throw new Error("Missing info");
   }
   const existedRecord = await Repository.findOne({ studentId: data.studentId });
-  console.log(existedRecord);
   if (!existedRecord) {
     return Repository.create(data);
   }
