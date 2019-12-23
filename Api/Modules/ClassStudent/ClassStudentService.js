@@ -4,6 +4,7 @@ import ClassRepository from "../Class/ClassRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import Xlsx from "node-xlsx";
+import FieldHelper from "../../../Common/FieldHelper";
 
 const find = async query => {
   return Repository.find(query);
@@ -54,7 +55,7 @@ const updateOrCreate = async data => {
     ErrorHelper.missingInput();
   }
 
-  const existedRecord = Repository.findOne({
+  const existedRecord = await Repository.findOne({
     student: data.student,
     class: data.class
   });
@@ -70,11 +71,14 @@ const upload = async data => {
   if (!file) {
     ErrorHelper.missingFile();
   }
+  if (!status) {
+    throw new Error("Please identify exam status");
+  }
   const parsedFile = Xlsx.parse(file.path);
   let updatedClassStudent = [];
   for (const sheet of parsedFile) {
     const { name, data } = sheet;
-    const fields = data.splice(0, 1);
+    const fields = data.splice(0, 1)[0];
     const studentIdIndex = fields.findIndex(v => v === "studentId");
     const classRecord = await ClassRepository.findOne({ code: name });
     if (studentIdIndex === -1) {
@@ -94,9 +98,7 @@ const upload = async data => {
           examStatus: status
         };
 
-        const classStudentRecord = await updateOrCreate(
-          classStudent
-        );
+        const classStudentRecord = await updateOrCreate(classStudent);
         if (classStudentRecord) {
           updatedClassStudent.push(classStudentRecord);
         }

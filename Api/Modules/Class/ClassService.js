@@ -3,6 +3,7 @@ import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import Xlsx from "node-xlsx";
 import UserRepository from "../User/UserRepository";
+import FieldHelper from "../../../Common/FieldHelper";
 const find = async query => {
   return Repository.find(query);
 };
@@ -81,9 +82,9 @@ const upload = async data => {
     for (const _class of data) {
       if (_class[codeIndex] && _class[nameIndex] && _class[lecturerIndex]) {
         const classData = {
-          code: _class[codeIndex],
-          name: _class[nameIndex],
-          lecturer: _class[lecturerIndex]
+          code: FieldHelper.check(_class[codeIndex]),
+          name: FieldHelper.check(_class[nameIndex]),
+          lecturer: FieldHelper.check(_class[lecturerIndex])
         };
         const classRecord = await updateOrCreate(classData);
         if (classRecord) {

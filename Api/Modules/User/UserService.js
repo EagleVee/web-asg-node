@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import { SECRET_KEY } from "../../../Config";
 import ErrorHelper from "../../../Common/ErrorHelper";
+import FieldHelper from "../../../Common/FieldHelper";
 
 const find = async query => {
   return Repository.find(query);
@@ -70,19 +71,29 @@ const upload = async data => {
   let updatedStudent = [];
   for (const sheet of parsedFile) {
     const { data } = sheet;
+    const fields = data.splice(0, 1)[0];
+    const studentIdIndex = fields.findIndex(v => v === "studentId");
+    const nameIndex = fields.findIndex(v => v === "name");
+    const passwordIndex = fields.findIndex(v => v === "password");
+    if (studentIdIndex === -1 || nameIndex === -1 || passwordIndex === -1) {
+      ErrorHelper.invalidFileFormat();
+    }
     for (const student of data) {
-      const studentId = student[1] ? student[1] : "";
-      const name = student[2] ? student[2] : "";
-      const hashedPassword = await bcrypt.hash(student[3], SECRET_KEY);
-      const studentRecord = {
-        username: studentId,
-        studentId: studentId,
-        name: name,
+      const hashedPassword = await bcrypt.hash(
+        FieldHelper.checkWithRandom(student[passwordIndex]),
+        SECRET_KEY
+      );
+      const studentData = {
+        username: FieldHelper.check(student[studentIdIndex]),
+        studentId: FieldHelper.check(student[studentIdIndex]),
+        name: FieldHelper.check(student[nameIndex]),
         password: hashedPassword,
         role: "student"
       };
-      const newRecord = await updateOrCreateStudent(studentRecord);
-      updatedStudent.push(newRecord);
+      const studentRecord = await updateOrCreateStudent(studentData);
+      if (studentRecord) {
+        updatedStudent.push(studentRecord);
+      }
     }
   }
   return updatedStudent;
