@@ -12,6 +12,7 @@ import RoomRouter from "./Api/Modules/ClassStudent/ClassStudentRouter";
 import ClassRouter from "./Api/Modules/Class/ClassRouter";
 import ShiftRouter from "./Api/Modules/Shift/ShiftRouter";
 import ShiftRoomRouter from "./Api/Modules/ShiftRoom/ShiftRoomRouter";
+import ClassStudentRouter from "./Api/Modules/ClassStudent/ClassStudentRouter";
 
 export const PORT = process.env.PORT || 5000;
 const mongoConnectionString =
@@ -40,6 +41,7 @@ app.use("/api/room", RoomRouter);
 app.use("/api/shift", ShiftRouter);
 app.use("/api/shift-room", ShiftRoomRouter);
 app.use("/api/class", ClassRouter);
+app.use("/api/class-student", ClassStudentRouter);
 
 const server = app.listen(PORT, function() {
   console.log(`Server run at localhost:${PORT}`);

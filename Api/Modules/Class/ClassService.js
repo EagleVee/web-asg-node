@@ -1,6 +1,8 @@
 import Repository from "./ClassRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
-
+import ErrorHelper from "../../../Common/ErrorHelper";
+import Xlsx from "node-xlsx";
+import UserRepository from "../User/UserRepository";
 const find = async query => {
   return Repository.find(query);
 };
@@ -45,12 +47,61 @@ const findByToken = async jwtToken => {
   return token.user;
 };
 
+const updateOrCreate = async data => {
+  if (!data || !data.code || !data.name || !data.lecturer) {
+    ErrorHelper.missingInput();
+  }
+  const existedRecord = await Repository.findOne({
+    code: data.code
+  });
+  if (!existedRecord) {
+    return Repository.create(data);
+  }
+
+  return Repository.update(existedRecord._id, data);
+};
+
+const upload = async data => {
+  const { file } = data;
+  if (!file) {
+    ErrorHelper.missingFile();
+  }
+  await Repository.deleteMany({});
+  const parsedFile = Xlsx.parse(file.path);
+  let updatedClass = [];
+  for (const sheet of parsedFile) {
+    const { data } = sheet;
+    const fields = data.splice(0, 1)[0];
+    const codeIndex = fields.findIndex(v => v === "code");
+    const nameIndex = fields.findIndex(v => v === "name");
+    const lecturerIndex = fields.findIndex(v => v === "lecturer");
+    if (codeIndex === -1 || nameIndex === -1 || lecturerIndex === -1) {
+      ErrorHelper.invalidFileFormat();
+    }
+    for (const _class of data) {
+      if (_class[codeIndex] && _class[nameIndex] && _class[lecturerIndex]) {
+        const classData = {
+          code: _class[codeIndex],
+          name: _class[nameIndex],
+          lecturer: _class[lecturerIndex]
+        };
+        const classRecord = await updateOrCreate(classData);
+        if (classRecord) {
+          updatedClass.push(classRecord);
+        }
+      }
+    }
+  }
+  return updatedClass;
+};
+
 const service = {
   find,
   findById,
   findByToken,
   create,
   update,
+  upload,
   deleteByID
 };
 

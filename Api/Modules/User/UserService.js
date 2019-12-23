@@ -61,7 +61,7 @@ const updateOrCreateStudent = async data => {
   return Repository.update(existedRecord._id, data);
 };
 
-const updateStudentList = async data => {
+const upload = async data => {
   const { file } = data;
   if (!file) {
     ErrorHelper.missingFile();
@@ -95,7 +95,7 @@ const service = {
   create,
   update,
   deleteByID,
-  updateStudentList
+  upload
 };
 
 export default service;

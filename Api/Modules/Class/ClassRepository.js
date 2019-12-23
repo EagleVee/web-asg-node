@@ -9,6 +9,10 @@ const ClassSchema = mongoose.Schema(
     name: {
       type: String,
       required: true
+    },
+    lecturer: {
+      type: String,
+      required: true
     }
   },
   {
@@ -61,6 +65,10 @@ const deleteById = async id => {
   return ClassModel.findByIdAndDelete(id);
 };
 
+const deleteMany = async query => {
+  return ClassModel.deleteMany(query);
+}
+
 const repository = {
   find,
   findOne,
@@ -68,7 +76,8 @@ const repository = {
   count,
   create,
   update,
-  deleteById
+  deleteById,
+  deleteMany
 };
 
 export default repository;

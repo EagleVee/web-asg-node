@@ -1,4 +1,6 @@
 import Repository from "./ClassStudentRepository";
+import UserRepository from "../User/UserRepository";
+import ClassRepository from "../Class/ClassRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import Xlsx from "node-xlsx";
@@ -47,7 +49,7 @@ const findByToken = async jwtToken => {
   return token.user;
 };
 
-const updateOrCreateClassStudent = async data => {
+const updateOrCreate = async data => {
   if (!data || !data.student || !data.class) {
     ErrorHelper.missingInput();
   }
@@ -63,26 +65,52 @@ const updateOrCreateClassStudent = async data => {
   return Repository.update(existedRecord._id, data);
 };
 
-const updateClassStudent = async data => {
-  const { file } = data;
+const upload = async data => {
+  const { file, status } = data;
   if (!file) {
     ErrorHelper.missingFile();
   }
-
-  const parsedFile = Xlsx.parse(file);
-  for(const sheet of parsedFile) {
-    const { data } = sheet;
+  const parsedFile = Xlsx.parse(file.path);
+  let updatedClassStudent = [];
+  for (const sheet of parsedFile) {
+    const { name, data } = sheet;
+    const fields = data.splice(0, 1);
+    const studentIdIndex = fields.findIndex(v => v === "studentId");
+    const classRecord = await ClassRepository.findOne({ code: name });
+    if (studentIdIndex === -1) {
+      ErrorHelper.invalidFileFormat();
+    }
+    if (!classRecord) {
+      throw new Error("Cannot find class");
+    }
     for (const student of data) {
+      const studentRecord = await UserRepository.findOne({
+        studentId: student[studentIdIndex]
+      });
+      if (studentRecord) {
+        const classStudent = {
+          student: studentRecord._id,
+          class: classRecord._id,
+          examStatus: status
+        };
 
+        const classStudentRecord = await updateOrCreate(
+          classStudent
+        );
+        if (classStudentRecord) {
+          updatedClassStudent.push(classStudentRecord);
+        }
+      }
     }
   }
-
+  return updatedClassStudent;
 };
 
 const service = {
   find,
   findById,
   findByToken,
+  upload,
   create,
   update,
   deleteByID

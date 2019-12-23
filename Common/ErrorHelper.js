@@ -14,4 +14,8 @@ export default class ErrorHelper {
   static missingFile() {
     throw new Error("Missing file");
   }
+
+  static invalidFileFormat() {
+    throw new Error("Invalid File Format");
+  }
 }
