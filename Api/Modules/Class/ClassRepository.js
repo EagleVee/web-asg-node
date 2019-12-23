@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const ClassSchema = mongoose.Schema(
   {
+    code: {
+      type: String,
+      required: true
+    },
     name: {
       type: String,
       required: true
@@ -32,6 +36,10 @@ const find = async query => {
   }
 };
 
+const findOne = async query => {
+  return ClassModel.findOne(query);
+};
+
 const count = async query => {
   return ClassModel.count(query);
 };
@@ -55,6 +63,7 @@ const deleteById = async id => {
 
 const repository = {
   find,
+  findOne,
   findById,
   count,
   create,

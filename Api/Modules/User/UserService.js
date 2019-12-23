@@ -64,7 +64,7 @@ const updateOrCreateStudent = async data => {
 const updateStudentList = async data => {
   const { file } = data;
   if (!file) {
-    throw new Error("Missing file");
+    ErrorHelper.missingFile();
   }
   const parsedFile = Xlsx.parse(file.path);
   let updatedStudent = [];

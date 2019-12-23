@@ -47,6 +47,12 @@ const find = async query => {
   }
 };
 
+const findOne = async query => {
+  return ClassStudentModel.findOne(query)
+    .populate("student")
+    .populate("class");
+};
+
 const count = async query => {
   return ClassStudentModel.count(query);
 };
@@ -72,6 +78,7 @@ const deleteById = async id => {
 
 const repository = {
   find,
+  findOne,
   findById,
   count,
   create,

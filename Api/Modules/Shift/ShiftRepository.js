@@ -50,6 +50,10 @@ const findById = async id => {
   return ShiftModel.findById(id).populate("class");
 };
 
+const findOne = async query => {
+  return ShiftModel.findOne(query);
+};
+
 const create = async data => {
   const newDocument = new ShiftModel(data);
   return newDocument.save();
@@ -66,6 +70,7 @@ const deleteById = async id => {
 const repository = {
   find,
   findById,
+  findOne,
   count,
   create,
   update,

@@ -1,6 +1,7 @@
 import Repository from "./ClassStudentRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
+import Xlsx from "node-xlsx";
 
 const find = async query => {
   return Repository.find(query);
@@ -50,6 +51,32 @@ const updateOrCreateClassStudent = async data => {
   if (!data || !data.student || !data.class) {
     ErrorHelper.missingInput();
   }
+
+  const existedRecord = Repository.findOne({
+    student: data.student,
+    class: data.class
+  });
+  if (!existedRecord) {
+    return Repository.create(data);
+  }
+
+  return Repository.update(existedRecord._id, data);
+};
+
+const updateClassStudent = async data => {
+  const { file } = data;
+  if (!file) {
+    ErrorHelper.missingFile();
+  }
+
+  const parsedFile = Xlsx.parse(file);
+  for(const sheet of parsedFile) {
+    const { data } = sheet;
+    for (const student of data) {
+
+    }
+  }
+
 };
 
 const service = {

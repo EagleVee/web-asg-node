@@ -46,6 +46,10 @@ const count = async query => {
   return ShiftRoomModel.count(query);
 };
 
+const findOne = async query => {
+  return ShiftRoomModel.findOne(query);
+};
+
 const findById = async id => {
   return ShiftRoomModel.findById(id);
 };
@@ -65,6 +69,7 @@ const deleteById = async id => {
 
 const repository = {
   find,
+  findOne,
   findById,
   count,
   create,
