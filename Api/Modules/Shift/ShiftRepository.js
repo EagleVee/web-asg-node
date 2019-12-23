@@ -67,6 +67,10 @@ const deleteById = async id => {
   return ShiftModel.findByIdAndDelete(id);
 };
 
+const deleteMany = async query => {
+  return ShiftModel.deleteMany(query);
+};
+
 const repository = {
   find,
   findById,

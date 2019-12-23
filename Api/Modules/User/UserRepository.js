@@ -77,6 +77,10 @@ const deleteById = async id => {
   return UserModel.findByIdAndDelete(id);
 };
 
+const deleteMany = async query => {
+  return UserModel.deleteMany(query);
+};
+
 const repository = {
   find,
   findOne,

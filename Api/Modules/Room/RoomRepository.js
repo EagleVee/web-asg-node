@@ -57,6 +57,10 @@ const deleteById = async id => {
   return RoomModel.findByIdAndDelete(id);
 };
 
+const deleteMany = async query => {
+  return RoomModel.deleteMany(query);
+};
+
 const repository = {
   find,
   findById,

@@ -76,6 +76,10 @@ const deleteById = async id => {
   return ClassStudentModel.findByIdAndDelete(id);
 };
 
+const deleteMany = async query => {
+  return ClassStudentModel.deleteMany(query);
+};
+
 const repository = {
   find,
   findOne,
