@@ -1,4 +1,7 @@
 export default class ErrorHelper {
+  static unauthenticated() {
+    throw new Error("Unauthenticated");
+  }
   static missingInput() {
     throw new Error("Missing input");
   }

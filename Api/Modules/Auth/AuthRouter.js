@@ -42,4 +42,14 @@ Router.get("/token/validate", async (req, res) => {
   }
 });
 
+Router.get("/me", Service.authentication, async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    const data = await Service.me(token);
+    res.status(200).send(ResponseJSON.success(data));
+  } catch (err) {
+    res.status(200).send(ResponseJSON.failed(err.message));
+  }
+});
+
 export default Router;

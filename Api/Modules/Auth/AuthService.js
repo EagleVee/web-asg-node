@@ -39,7 +39,7 @@ const login = async data => {
     const accessTokenRecord = await AccessTokenRepository.create({
       user: existedUser._id,
       jwtToken: accessToken,
-      expiredAt: expireAt
+      expireAt: expireAt
     });
 
     return {
@@ -72,11 +72,11 @@ const validateToken = async token => {
   if (!existedToken) {
     throw new Error("Invalid token!");
   }
-  if (existedToken.expiredAt < Date.now()) {
+  if (existedToken.expireAt < Date.now()) {
     throw new Error("Token expired!");
   }
   const newExpireDate = Date.now() + TOKEN_EXPIRE_MILLISECOND;
-  return await AccessTokenRepository.updateExpireAt(token, newExpireDate);
+  return AccessTokenRepository.updateExpireAt(token, newExpireDate);
 };
 
 const logoutToken = async token => {
@@ -101,7 +101,7 @@ const authentication = async (req, res, next) => {
     if (!accessToken) {
       res.status(200).send(ResponseJSON("Invalid token!"));
     }
-    if (accessToken.expire_at <= Date.now()) {
+    if (accessToken.expireAt <= Date.now()) {
       res.status(200).send(ResponseJSON("Token expired!"));
     }
     req.user = accessToken.user;
@@ -112,7 +112,16 @@ const authentication = async (req, res, next) => {
 };
 
 const authorization = (user, roles) => {
-  return !!(user && roles.indexOf(user.role) >= 0);
+  return user && roles.indexOf(user.role) >= 0;
+};
+
+const me = async token => {
+  const accessTokenRecord = await AccessTokenRepository.findByToken(token);
+  if (!accessTokenRecord) {
+    ErrorHelper.unauthenticated();
+  }
+
+  return UserRepository.findById(accessTokenRecord.user);
 };
 
 // const refreshToken = async (token) => {
@@ -126,7 +135,8 @@ const service = {
   authentication,
   authorization,
   validateToken,
-  logoutToken
+  logoutToken,
+  me
 };
 
 export default service;
