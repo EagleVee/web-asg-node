@@ -67,7 +67,8 @@ const repository = {
   count,
   create,
   update,
-  deleteById
+  deleteById,
+  deleteMany
 };
 
 export default repository;
