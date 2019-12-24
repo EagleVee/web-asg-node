@@ -10,6 +10,7 @@ import {
   TOKEN_EXPIRE_MILLISECOND
 } from "../../../Config";
 import ResponseJSON from "../../../Config/ResponseJSON";
+import ErrorHelper from "../../../Common/ErrorHelper";
 
 const login = async data => {
   if (!data.username || !data.password) {
@@ -35,7 +36,7 @@ const login = async data => {
 
     const expireAt = Date.now() + TOKEN_EXPIRE_MILLISECOND;
 
-    const accessTokenData = await AccessTokenRepository.create({
+    const accessTokenRecord = await AccessTokenRepository.create({
       user: existedUser._id,
       jwtToken: accessToken,
       expiredAt: expireAt
