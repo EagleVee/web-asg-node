@@ -66,7 +66,7 @@ const updateOrCreate = async data => {
   return Repository.update(existedRecord._id, data);
 };
 
-const upload = async data => {
+const upload = async (id, data) => {
   const { file, status } = data;
   if (!file) {
     ErrorHelper.missingFile();
@@ -77,10 +77,10 @@ const upload = async data => {
   const parsedFile = Xlsx.parse(file.path);
   let updatedClassStudent = [];
   for (const sheet of parsedFile) {
-    const { name, data } = sheet;
+    const { data } = sheet;
     const fields = data.splice(0, 1)[0];
     const studentIdIndex = fields.findIndex(v => v === "studentId");
-    const classRecord = await ClassRepository.findOne({ code: name });
+    const classRecord = await ClassRepository.findById(id);
     if (studentIdIndex === -1) {
       ErrorHelper.invalidFileFormat();
     }

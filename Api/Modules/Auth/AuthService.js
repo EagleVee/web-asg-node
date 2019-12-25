@@ -73,10 +73,14 @@ const validateToken = async token => {
     throw new Error("Invalid token!");
   }
   if (existedToken.expireAt < Date.now()) {
-    throw new Error("Token expired!");
+    return {
+      is_alive: false
+    };
   }
-  const newExpireDate = Date.now() + TOKEN_EXPIRE_MILLISECOND;
-  return AccessTokenRepository.updateExpireAt(token, newExpireDate);
+  existedToken.expireAt = Date.now() + TOKEN_EXPIRE_MILLISECOND;
+  return {
+    is_alive: true
+  };
 };
 
 const logoutToken = async token => {
