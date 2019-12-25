@@ -69,7 +69,8 @@ const create = async data => {
 };
 
 const update = async (id, data) => {
-  return ClassStudentModel.findByIdAndUpdate(id, { $set: data }, { new: true });
+  await ClassStudentModel.findByIdAndUpdate(id, { $set: data }, { new: true });
+  return findById(id);
 };
 
 const deleteById = async id => {

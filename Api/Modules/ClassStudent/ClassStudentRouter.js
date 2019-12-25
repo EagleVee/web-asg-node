@@ -51,7 +51,7 @@ Router.delete("/:id", async function(req, res) {
 
 Router.post("/upload/:id", Upload.single("file"), async function(req, res) {
   try {
-    const data = await Service.upload(id, req);
+    const data = await Service.upload(req.params.id, req);
     res.status(200).send(ResponseJSON.success(data));
   } catch (err) {
     res.status(200).send(ResponseJSON.failed(err.message));

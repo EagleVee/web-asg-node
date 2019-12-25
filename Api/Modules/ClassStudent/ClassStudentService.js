@@ -67,7 +67,8 @@ const updateOrCreate = async data => {
 };
 
 const upload = async (id, data) => {
-  const { file, status } = data;
+  const { file, body } = data;
+  const { status } = body;
   if (!file) {
     ErrorHelper.missingFile();
   }

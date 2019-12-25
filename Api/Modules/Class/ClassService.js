@@ -67,7 +67,6 @@ const upload = async data => {
   if (!file) {
     ErrorHelper.missingFile();
   }
-  await Repository.deleteMany({});
   const parsedFile = Xlsx.parse(file.path);
   let updatedClass = [];
   for (const sheet of parsedFile) {
