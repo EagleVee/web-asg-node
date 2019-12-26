@@ -52,6 +52,10 @@ const findOne = async query => {
   return UserModel.findOne(query);
 };
 
+const findOneLean = async query => {
+  return UserModel.findOne(query).lean();
+}
+
 const count = async query => {
   return UserModel.count(query);
 };
@@ -84,6 +88,7 @@ const deleteMany = async query => {
 const repository = {
   find,
   findOne,
+  findOneLean,
   findById,
   findByEmail,
   count,

@@ -4,8 +4,7 @@ const ShiftSchema = mongoose.Schema(
   {
     class: {
       type: mongoose.Schema.Types.ObjectID,
-      ref: "Class",
-      required: true
+      ref: "Class"
     },
     beginAt: {
       type: Number,

@@ -53,6 +53,10 @@ const findOne = async query => {
     .populate("class");
 };
 
+const findOneLean = async query => {
+  return ClassStudentModel.findOne(query).lean();
+};
+
 const count = async query => {
   return ClassStudentModel.count(query);
 };
@@ -84,6 +88,7 @@ const deleteMany = async query => {
 const repository = {
   find,
   findOne,
+  findOneLean,
   findById,
   count,
   create,

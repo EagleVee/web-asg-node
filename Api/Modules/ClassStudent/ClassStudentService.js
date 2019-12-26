@@ -55,7 +55,7 @@ const updateOrCreate = async data => {
     ErrorHelper.missingInput();
   }
 
-  const existedRecord = await Repository.findOne({
+  const existedRecord = await Repository.findOneLean({
     student: data.student,
     class: data.class
   });
@@ -89,7 +89,7 @@ const upload = async (id, data) => {
       throw new Error("Cannot find class");
     }
     for (const student of data) {
-      const studentRecord = await UserRepository.findOne({
+      const studentRecord = await UserRepository.findOneLean({
         studentId: student[studentIdIndex]
       });
       if (studentRecord) {
