@@ -24,6 +24,10 @@ const update = async function(id, data) {
     ErrorHelper.entityNotFound();
   }
 
+  if (data.newStudent) {
+    const { _id } = newStudent;
+  }
+
   return Repository.update(id, data);
 };
 
@@ -41,15 +45,9 @@ const validateEmail = email => {
   return re.test(String(email).toLowerCase());
 };
 
-const findByToken = async jwtToken => {
-  const token = await AccessTokenRepository.findByToken(jwtToken);
-  return token.user;
-};
-
 const service = {
   find,
   findById,
-  findByToken,
   create,
   update,
   deleteByID

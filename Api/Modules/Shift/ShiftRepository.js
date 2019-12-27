@@ -42,7 +42,7 @@ const find = async query => {
 };
 
 const findLean = async query => {
-  return ShiftModel.find(query).lean();
+  return ShiftModel.find(query).populate("class").lean();
 };
 
 const findOneLean = async query => {

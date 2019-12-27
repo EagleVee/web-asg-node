@@ -45,11 +45,6 @@ const validateEmail = email => {
   return re.test(String(email).toLowerCase());
 };
 
-const findByToken = async jwtToken => {
-  const token = await AccessTokenRepository.findByToken(jwtToken);
-  return token.user;
-};
-
 const updateOrCreate = async data => {
   if (!data || !data.name || !data.seat) {
     return null;
@@ -93,7 +88,6 @@ const upload = async req => {
 const service = {
   find,
   findById,
-  findByToken,
   create,
   update,
   deleteByID,

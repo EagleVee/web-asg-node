@@ -11,7 +11,13 @@ const ShiftRoomSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectID,
       ref: "Room",
       required: true
-    }
+    },
+    students: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ]
   },
   {
     timestamps: {
@@ -34,12 +40,21 @@ const find = async query => {
       .limit(limit)
       .skip(skip)
       .populate("shift")
-      .populate("room");
+      .populate("room")
+      .populate("students");
   } else {
     return ShiftRoomModel.find(query)
       .populate("shift")
-      .populate("room");
+      .populate("room")
+      .populate("students");
   }
+};
+
+const findLean = async query => {
+  return ShiftRoomModel.find(query)
+    .populate("shift")
+    .populate("room")
+    .lean();
 };
 
 const count = async query => {
@@ -47,11 +62,18 @@ const count = async query => {
 };
 
 const findOne = async query => {
-  return ShiftRoomModel.findOne(query);
+  return ShiftRoomModel.findOne(query)
+    .populate("shift")
+    .populate("room")
+    .populate("students");
+};
+
+const findOneLean = async query => {
+  return ShiftRoomModel.findOne(query).lean();
 };
 
 const findById = async id => {
-  return ShiftRoomModel.findById(id);
+  return ShiftRoomModel.findById(id).lean();
 };
 
 const create = async data => {
@@ -74,6 +96,8 @@ const deleteMany = async query => {
 const repository = {
   find,
   findOne,
+  findLean,
+  findOneLean,
   findById,
   count,
   create,
