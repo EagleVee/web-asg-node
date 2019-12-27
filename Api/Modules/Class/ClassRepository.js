@@ -40,8 +40,28 @@ const find = async query => {
   }
 };
 
+const findLean = async query => {
+  const { paginate, page } = query;
+  if (paginate && page !== undefined) {
+    const limit = Number(paginate);
+    const skip = (Number(page) - 1) * Number(paginate);
+    delete query.paginate;
+    delete query.page;
+    return ClassModel.find(query)
+      .limit(limit)
+      .skip(skip)
+      .lean();
+  } else {
+    return ClassModel.find(query).lean();
+  }
+};
+
 const findOne = async query => {
   return ClassModel.findOne(query);
+};
+
+const findOneLean = async query => {
+  return ClassModel.findOne(query).lean();
 };
 
 const count = async query => {
@@ -67,11 +87,13 @@ const deleteById = async id => {
 
 const deleteMany = async query => {
   return ClassModel.deleteMany(query);
-}
+};
 
 const repository = {
   find,
   findOne,
+  findOneLean,
+  findLean,
   findById,
   count,
   create,

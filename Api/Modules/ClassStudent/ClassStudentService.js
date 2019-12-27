@@ -52,7 +52,7 @@ const findByToken = async jwtToken => {
 
 const updateOrCreate = async data => {
   if (!data || !data.student || !data.class) {
-    ErrorHelper.missingInput();
+    return null;
   }
 
   const existedRecord = await Repository.findOneLean({
@@ -66,8 +66,8 @@ const updateOrCreate = async data => {
   return Repository.update(existedRecord._id, data);
 };
 
-const upload = async (id, data) => {
-  const { file, body } = data;
+const upload = async (id, req) => {
+  const { file, body } = req;
   const { status } = body;
   if (!file) {
     ErrorHelper.missingFile();
@@ -75,34 +75,34 @@ const upload = async (id, data) => {
   if (!status) {
     throw new Error("Please identify exam status");
   }
+  const classRecord = await ClassRepository.findById(id);
+  if (!classRecord) {
+    throw new Error("Cannot find class");
+  }
   const parsedFile = Xlsx.parse(file.path);
   let updatedClassStudent = [];
-  for (const sheet of parsedFile) {
-    const { data } = sheet;
-    const fields = data.splice(0, 1)[0];
-    const studentIdIndex = fields.findIndex(v => v === "studentId");
-    const classRecord = await ClassRepository.findById(id);
-    if (studentIdIndex === -1) {
-      ErrorHelper.invalidFileFormat();
-    }
-    if (!classRecord) {
-      throw new Error("Cannot find class");
-    }
-    for (const student of data) {
-      const studentRecord = await UserRepository.findOneLean({
-        studentId: student[studentIdIndex]
-      });
-      if (studentRecord) {
-        const classStudent = {
-          student: studentRecord._id,
-          class: classRecord._id,
-          examStatus: status
-        };
+  const sheet = parsedFile[0];
+  const { data } = sheet;
+  const fields = data.splice(0, 1)[0];
+  const studentIdIndex = fields.findIndex(v => v === "studentId");
+  if (studentIdIndex === -1) {
+    ErrorHelper.invalidFileFormat();
+  }
+  await Repository.deleteMany({ class: id });
+  for (const student of data) {
+    const studentRecord = await UserRepository.findOneLean({
+      studentId: student[studentIdIndex]
+    });
+    if (studentRecord) {
+      const classStudent = {
+        student: studentRecord._id,
+        class: classRecord._id,
+        examStatus: status
+      };
 
-        const classStudentRecord = await updateOrCreate(classStudent);
-        if (classStudentRecord) {
-          updatedClassStudent.push(classStudentRecord);
-        }
+      const classStudentRecord = await updateOrCreate(classStudent);
+      if (classStudentRecord) {
+        updatedClassStudent.push(classStudentRecord);
       }
     }
   }

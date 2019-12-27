@@ -44,6 +44,18 @@ const findById = async id => {
   return RoomModel.findById(id);
 };
 
+const findOne = async query => {
+  return RoomModel.findOne(query);
+};
+
+const findOneLean = async query => {
+  return RoomModel.findOne(query).lean();
+};
+
+const findLean = async query => {
+  return RoomModel.find(query).lean();
+};
+
 const create = async data => {
   const newDocument = new RoomModel(data);
   return newDocument.save();
@@ -63,6 +75,9 @@ const deleteMany = async query => {
 
 const repository = {
   find,
+  findOne,
+  findOneLean,
+  findLean,
   findById,
   count,
   create,

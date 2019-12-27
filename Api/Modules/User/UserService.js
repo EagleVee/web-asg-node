@@ -53,9 +53,9 @@ const findByToken = async jwtToken => {
 
 const updateOrCreateStudent = async data => {
   if (!data || !data.studentId || !data.name || !data.password) {
-    ErrorHelper.missingInput();
+    return null;
   }
-  const existedRecord = await Repository.findOne({ studentId: data.studentId });
+  const existedRecord = await Repository.findOneLean({ studentId: data.studentId });
   if (!existedRecord) {
     return Repository.create(data);
   }

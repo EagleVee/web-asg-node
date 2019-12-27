@@ -11,7 +11,7 @@ const findById = async id => {
 };
 
 const create = async data => {
-  if (!data) {
+  if (!data || !data.beginAt || !data.endAt) {
     ErrorHelper.missingInput();
   }
 

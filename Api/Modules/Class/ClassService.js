@@ -50,9 +50,9 @@ const findByToken = async jwtToken => {
 
 const updateOrCreate = async data => {
   if (!data || !data.code || !data.name || !data.lecturer) {
-    ErrorHelper.missingInput();
+    return null;
   }
-  const existedRecord = await Repository.findOne({
+  const existedRecord = await Repository.findOneLean({
     code: data.code
   });
   if (!existedRecord) {

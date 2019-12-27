@@ -8,7 +8,7 @@ import {
 } from "./Config";
 import UserRouter from "./Api/Modules/User/UserRouter";
 import AuthRouter from "./Api/Modules/Auth/AuthRouter";
-import RoomRouter from "./Api/Modules/ClassStudent/ClassStudentRouter";
+import RoomRouter from "./Api/Modules/Room/RoomRouter";
 import ClassRouter from "./Api/Modules/Class/ClassRouter";
 import ShiftRouter from "./Api/Modules/Shift/ShiftRouter";
 import ShiftRoomRouter from "./Api/Modules/ShiftRoom/ShiftRoomRouter";

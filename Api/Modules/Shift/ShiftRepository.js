@@ -41,6 +41,14 @@ const find = async query => {
   }
 };
 
+const findLean = async query => {
+  return ShiftModel.find(query).lean();
+};
+
+const findOneLean = async query => {
+  return ShiftModel.findOne(query).lean();
+};
+
 const count = async query => {
   return ShiftModel.count(query);
 };
@@ -73,6 +81,8 @@ const deleteMany = async query => {
 const repository = {
   find,
   findById,
+  findLean,
+  findOneLean,
   findOne,
   count,
   create,
