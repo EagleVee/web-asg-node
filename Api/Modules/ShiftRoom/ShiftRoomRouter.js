@@ -12,14 +12,14 @@ Router.get("/", async function(req, res) {
   }
 });
 
-Router.get("/:id", async function(req, res) {
-  try {
-    const data = await Service.findById(req.params.id);
-    res.status(200).send(ResponseJSON.success(data));
-  } catch (err) {
-    res.status(200).send(ResponseJSON.failed(err.message));
-  }
-});
+// Router.get("/:id", async function(req, res) {
+//   try {
+//     const data = await Service.findById(req.params.id);
+//     res.status(200).sex`nd(ResponseJSON.success(data));
+//   } catch (err) {
+//     res.status(200).send(ResponseJSON.failed(err.message));
+//   }
+// });
 
 Router.post("/", async function(req, res) {
   try {
@@ -55,6 +55,15 @@ Router.post("/register", async function(req, res) {
   } catch (err) {
     res.status(200).send(ResponseJSON.failed(err.message));
   }
-})
+});
+
+Router.get("/register", async function(req, res) {
+  try {
+    const data = await Service.findRegisteredRooms(req.query);
+    res.status(200).send(ResponseJSON.success(data));
+  } catch (err) {
+    res.status(200).send(ResponseJSON.failed(err.message));
+  }
+});
 
 export default Router;

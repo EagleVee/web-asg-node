@@ -1,5 +1,4 @@
 import Repository from "./ClassRepository";
-import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import Xlsx from "node-xlsx";
 import ClassStudentRepository from "../ClassStudent/ClassStudentRepository";

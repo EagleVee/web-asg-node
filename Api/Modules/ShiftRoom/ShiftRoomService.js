@@ -43,8 +43,12 @@ const find = async query => {
   return Repository.find(query);
 };
 
-const findAllRooms = async id => {
-  return result;
+const findRegisteredRooms = async query => {
+  if (!query || !query.student) {
+    ErrorHelper.missingInput();
+  }
+
+  return Repository.findLean({ students: query.student });
 };
 
 const findById = async id => {
@@ -87,7 +91,6 @@ const validateEmail = email => {
 };
 
 const studentRegister = async data => {
-  console.log(data);
   if (
     !data ||
     !data.student ||
@@ -110,12 +113,12 @@ const studentRegister = async data => {
       if (register) {
         students.push(student);
       } else {
-        const index = students.findIndex(v => v === student);
+        const index = students.findIndex(v => v.toString() === student);
         students.splice(index, 1);
       }
       await Repository.update(_id, shiftRoom);
     } else {
-      const index = students.findIndex(v => v === student);
+      const index = students.findIndex(v => v.toString() === student);
       if (index >= 0) {
         students.splice(index, 1);
         await Repository.update(_id, shiftRoom);
@@ -131,7 +134,7 @@ const studentRegister = async data => {
 const service = {
   find,
   findById,
-  findAllRooms,
+  findRegisteredRooms,
   create,
   update,
   deleteByID,

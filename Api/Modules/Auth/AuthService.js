@@ -69,6 +69,7 @@ const register = async data => {
 
 const validateToken = async token => {
   const existedToken = await AccessTokenRepository.findByToken(token);
+  console.log(existedToken);
   if (!existedToken) {
     throw new Error("Invalid token!");
   }
