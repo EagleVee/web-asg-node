@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ErrorHelper from "../../../Common/ErrorHelper";
 
 const ClassStudentSchema = mongoose.Schema(
   {

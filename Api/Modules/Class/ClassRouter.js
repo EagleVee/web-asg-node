@@ -15,7 +15,7 @@ Router.get("/", async function(req, res) {
 
 Router.get("/:id", async function(req, res) {
   try {
-    const data = await Service.findById(req.params.id);
+    const data = await Service.findById(req.params.id, req.query);
     res.status(200).send(ResponseJSON.success(data));
   } catch (err) {
     res.status(200).send(ResponseJSON.failed(err.message));

@@ -26,8 +26,22 @@ const find = async query => {
   return Repository.find(query);
 };
 
-const findById = async id => {
-  return Repository.findById(id);
+const findById = async (id, query) => {
+  const record = await Repository.findByIdLean(id);
+  if (query.student) {
+    const classStudentRecord = await ClassStudentRepository.findOneLean({
+      class: id,
+      student: query.student
+    });
+
+    if (classStudentRecord) {
+      record.examStatus = classStudentRecord.examStatus;
+    } else {
+      record.examStatus = null;
+    }
+  }
+
+  return record;
 };
 
 const create = async data => {
