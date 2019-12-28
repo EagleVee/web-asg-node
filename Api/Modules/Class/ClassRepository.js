@@ -72,6 +72,10 @@ const findById = async id => {
   return ClassModel.findById(id);
 };
 
+const findByIdLean = async id => {
+  return ClassModel.findById(id).lean();
+};
+
 const create = async data => {
   const newDocument = new ClassModel(data);
   return newDocument.save();
@@ -95,6 +99,7 @@ const repository = {
   findOneLean,
   findLean,
   findById,
+  findByIdLean,
   count,
   create,
   update,

@@ -35,34 +35,54 @@ const create = async data => {
     ErrorHelper.missingInput();
   }
 
-  if (data.code) {
-    const classRecord = await ClassRepository.findOneLean({ code: data.code });
-    if (classRecord) {
-      data.class = classRecord._id;
-    } else {
-      throw new Error("Không tìm thấy mã lớp học phần");
-    }
-  }
+  const _data = await validateData(data);
 
-  const shiftRecord = await Repository.create(data);
-  console.log(data);
+  const shiftRecord = await Repository.create(_data);
+
+  await createRooms(shiftRecord._id, _data);
+
+  return shiftRecord;
+};
+
+const createRooms = async (shiftId, data) => {
   if (data.rooms) {
     for (const room of data.rooms) {
       const roomRecord = await RoomRepository.findOneLean({ name: room });
       if (roomRecord) {
         const shiftRoomData = {
-          shift: shiftRecord._id,
+          shift: shiftId,
           room: roomRecord._id,
           students: []
         };
-        const shiftRoomRecord = await ShiftRoomRepository.create(shiftRoomData);
+        await ShiftRoomRepository.create(shiftRoomData);
       } else {
         throw new Error("Không tìm thấy phòng thi");
       }
     }
   }
+};
 
-  return shiftRecord;
+const updateRooms = async (shiftId, data) => {
+  if (data.rooms) {
+    for (const room of data.rooms) {
+      const roomRecord = await RoomRepository.findOneLean({ name: room });
+      if (!roomRecord) {
+        throw new Error("Không tìm thấy phòng thi");
+      }
+      const shiftRoomRecord = await ShiftRoomRepository.findOneLean({
+        shift: shiftId,
+        room: roomRecord._id
+      });
+
+      if (!shiftRoomRecord) {
+        await ShiftRoomRepository.create({
+          shift: shiftId,
+          room: roomRecord._id,
+          students: []
+        });
+      }
+    }
+  }
 };
 
 const update = async function(id, data) {
@@ -71,7 +91,40 @@ const update = async function(id, data) {
     ErrorHelper.entityNotFound();
   }
 
-  return Repository.update(id, data);
+  const _data = await validateData(data);
+
+  await updateRooms(id, _data);
+
+  return Repository.update(id, _data);
+};
+
+const validateData = async (data, next) => {
+  if (data.code) {
+    const classRecord = await ClassRepository.findOneLean({ code: data.code });
+    if (classRecord) {
+      data.class = classRecord._id;
+    } else {
+      if (next) {
+        next();
+        return null;
+      }
+      throw new Error("Không tìm thấy mã lớp học phần");
+    }
+  }
+
+  const classShifts = await Repository.findLean({ class: data.class });
+  for (const shift of classShifts) {
+    const { beginAt, endAt } = shift;
+    if (data.beginAt < endAt || data.endAt < beginAt) {
+      if (next) {
+        next();
+        return null;
+      }
+      throw new Error("Đã có ca thi khác trong khung giờ này");
+    }
+  }
+
+  return data;
 };
 
 const deleteByID = async id => {
@@ -81,20 +134,6 @@ const deleteByID = async id => {
   }
 
   return Repository.delete(id);
-};
-
-const updateOrCreate = async data => {
-  if (!data || !data.beginAt || !data.endAt || !data.class) {
-    return null;
-  }
-  const existedRecord = await Repository.findOneLean({
-    class: data.class
-  });
-  if (!existedRecord) {
-    return Repository.create(data);
-  }
-
-  return Repository.update(existedRecord._id, data);
 };
 
 const upload = async data => {
@@ -154,7 +193,11 @@ const upload = async data => {
           beginAt: beginUnix,
           endAt: endUnix
         };
-        const shiftRecord = await Repository.create(shiftData);
+        const _data = await validateData(shiftData, () => {});
+        if (!_data) {
+          continue;
+        }
+        const shiftRecord = await Repository.create(_data);
         if (!shiftRecord) {
           continue;
         }

@@ -2,9 +2,27 @@ import Repository from "./ClassRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import Xlsx from "node-xlsx";
-import UserRepository from "../User/UserRepository";
+import ClassStudentRepository from "../ClassStudent/ClassStudentRepository";
 import FieldHelper from "../../../Common/FieldHelper";
+
 const find = async query => {
+  if (query.student) {
+    const classStudentRecords = await ClassStudentRepository.findLean({
+      student: query.student
+    });
+    if (!classStudentRecords.length || classStudentRecords.length === 0) {
+      return [];
+    }
+    let result = [];
+    for (const classStudent of classStudentRecords) {
+      const classRecord = await Repository.findByIdLean(classStudent.class);
+      if (classRecord) {
+        result.push(classRecord);
+      }
+    }
+
+    return result;
+  }
   return Repository.find(query);
 };
 
