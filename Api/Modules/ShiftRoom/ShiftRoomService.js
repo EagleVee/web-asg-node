@@ -87,11 +87,18 @@ const validateEmail = email => {
 };
 
 const studentRegister = async data => {
-  if (!data || !data.student || !data.shift || !data.newRoom) {
+  console.log(data);
+  if (
+    !data ||
+    !data.student ||
+    !data.shift ||
+    !data.newRoom ||
+    data.register === null ||
+    data.register === undefined
+  ) {
     ErrorHelper.missingInput();
   }
-
-  const { student, shift, newRoom } = data;
+  const { student, shift, newRoom, register } = data;
 
   const shiftRoomRecords = await Repository.findLean({
     shift: shift
@@ -100,7 +107,12 @@ const studentRegister = async data => {
   for (let shiftRoom of shiftRoomRecords) {
     const { _id, students, room } = shiftRoom;
     if (newRoom === room._id.toString()) {
-      students.push(student);
+      if (register) {
+        students.push(student);
+      } else {
+        const index = students.findIndex(v => v === student);
+        students.splice(index, 1);
+      }
       await Repository.update(_id, shiftRoom);
     } else {
       const index = students.findIndex(v => v === student);

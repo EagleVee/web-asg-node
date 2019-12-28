@@ -55,7 +55,9 @@ const updateOrCreateStudent = async data => {
   if (!data || !data.studentId || !data.name || !data.password) {
     return null;
   }
-  const existedRecord = await Repository.findOneLean({ studentId: data.studentId });
+  const existedRecord = await Repository.findOneLean({
+    studentId: data.studentId
+  });
   if (!existedRecord) {
     return Repository.create(data);
   }
@@ -75,7 +77,13 @@ const upload = async data => {
     const studentIdIndex = fields.findIndex(v => v === "studentId");
     const nameIndex = fields.findIndex(v => v === "name");
     const passwordIndex = fields.findIndex(v => v === "password");
-    if (studentIdIndex === -1 || nameIndex === -1 || passwordIndex === -1) {
+    const roleIndex = fields.findIndex(v => v === "role");
+    if (
+      studentIdIndex === -1 ||
+      nameIndex === -1 ||
+      passwordIndex === -1 ||
+      roleIndex === -1
+    ) {
       ErrorHelper.invalidFileFormat();
     }
     for (const student of data) {
@@ -88,7 +96,7 @@ const upload = async data => {
         studentId: FieldHelper.check(student[studentIdIndex]),
         name: FieldHelper.check(student[nameIndex]),
         password: hashedPassword,
-        role: "student"
+        role: FieldHelper.check(student[roleIndex], "student")
       };
       const studentRecord = await updateOrCreateStudent(studentData);
       if (studentRecord) {

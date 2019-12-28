@@ -34,18 +34,36 @@ const UserSchema = mongoose.Schema(
 const UserModel = mongoose.model("User", UserSchema);
 
 const find = async query => {
-  const { paginate, page } = query;
+  const { paginate, page, search } = query;
+  let findQuery = UserModel.find({});
+  if (search && search.length > 0) {
+    findQuery = findQuery.find({
+      $or: [
+        {
+          studentId: {
+            $regex: search,
+            $options: "i"
+          }
+        },
+        {
+          name: {
+            $regex: search,
+            $options: "i"
+          }
+        }
+      ]
+    });
+    delete query.search;
+  }
   if (paginate && page !== undefined) {
     const limit = Number(paginate);
     const skip = (Number(page) - 1) * Number(paginate);
     delete query.paginate;
     delete query.page;
-    return UserModel.find(query)
-      .limit(limit)
-      .skip(skip);
-  } else {
-    return UserModel.find(query);
+    return findQuery.find(query).limit(limit).skip(skip);
   }
+
+  return findQuery;
 };
 
 const findOne = async query => {
@@ -54,7 +72,7 @@ const findOne = async query => {
 
 const findOneLean = async query => {
   return UserModel.findOne(query).lean();
-}
+};
 
 const count = async query => {
   return UserModel.count(query);

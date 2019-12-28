@@ -1,6 +1,6 @@
 export default class FieldHelper {
-  static check(field) {
-    return field ? field : "";
+  static check(field, defaultValue = "") {
+    return field ? field : defaultValue;
   }
 
   static checkWithRandom(field) {
