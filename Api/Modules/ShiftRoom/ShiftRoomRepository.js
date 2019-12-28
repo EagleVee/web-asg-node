@@ -82,6 +82,7 @@ const create = async data => {
 };
 
 const update = async (id, data) => {
+  console.log(id, data);
   return ShiftRoomModel.findByIdAndUpdate(id, { $set: data }, { new: true });
 };
 

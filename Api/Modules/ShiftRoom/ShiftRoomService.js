@@ -27,7 +27,8 @@ const find = async query => {
         }
         if (query.student) {
           shiftRoom.registered =
-            shiftRoom.students.findIndex(v => v === query.student) >= 0;
+            shiftRoom.students.findIndex(v => v.toString() === query.student) >=
+            0;
         }
 
         const { seat } = room;
@@ -86,11 +87,11 @@ const validateEmail = email => {
 };
 
 const studentRegister = async data => {
-  if (!data || !data.student || !data.shift || !data.room) {
+  if (!data || !data.student || !data.shift || !data.newRoom) {
     ErrorHelper.missingInput();
   }
 
-  const { student, shift, room } = data;
+  const { student, shift, newRoom } = data;
 
   const shiftRoomRecords = await Repository.findLean({
     shift: shift
@@ -98,19 +99,21 @@ const studentRegister = async data => {
 
   for (let shiftRoom of shiftRoomRecords) {
     const { _id, students, room } = shiftRoom;
-    if (room === room) {
+    if (newRoom === room._id.toString()) {
       students.push(student);
-      return Repository.update(_id, shiftRoom);
+      await Repository.update(_id, shiftRoom);
     } else {
       const index = students.findIndex(v => v === student);
       if (index >= 0) {
         students.splice(index, 1);
-        return Repository.update(_id, shiftRoom);
+        await Repository.update(_id, shiftRoom);
       }
     }
   }
 
-  return null;
+  return {
+    updated: true
+  };
 };
 
 const service = {
