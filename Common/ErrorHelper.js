@@ -1,9 +1,9 @@
 export default class ErrorHelper {
   static unauthenticated() {
-    throw new Error("Unauthenticated");
+    throw new Error("Bạn không có quyền truy cập");
   }
   static missingInput() {
-    throw new Error("Missing input");
+    throw new Error("Thiếu thông tin");
   }
 
   static notExisted() {
@@ -11,14 +11,14 @@ export default class ErrorHelper {
   }
 
   static entityNotFound() {
-    throw new Error("Entity not found");
+    throw new Error("Không tìm thấy");
   }
 
   static missingFile() {
-    throw new Error("Missing file");
+    throw new Error("Thiếu file");
   }
 
   static invalidFileFormat() {
-    throw new Error("Invalid File Format");
+    throw new Error("Định dạng file không đúng");
   }
 }
