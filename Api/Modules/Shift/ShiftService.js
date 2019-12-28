@@ -3,6 +3,8 @@ import ClassRepository from "../Class/ClassRepository";
 import ShiftRoomRepository from "../ShiftRoom/ShiftRoomRepository";
 import RoomRepository from "../Room/RoomRepository";
 import ErrorHelper from "../../../Common/ErrorHelper";
+import Xlsx from "node-xlsx";
+import moment from "moment";
 
 const find = async query => {
   let list = await Repository.findLean(query);
@@ -81,12 +83,107 @@ const deleteByID = async id => {
   return Repository.delete(id);
 };
 
+const updateOrCreate = async data => {
+  if (!data || !data.beginAt || !data.endAt || !data.class) {
+    return null;
+  }
+  const existedRecord = await Repository.findOneLean({
+    class: data.class
+  });
+  if (!existedRecord) {
+    return Repository.create(data);
+  }
+
+  return Repository.update(existedRecord._id, data);
+};
+
+const upload = async data => {
+  const { file } = data;
+  if (!file) {
+    ErrorHelper.missingFile();
+  }
+  const parsedFile = Xlsx.parse(file.path);
+  let updatedShift = [];
+  for (const sheet of parsedFile) {
+    const { data } = sheet;
+    const fields = data.splice(0, 1)[0];
+    const classIndex = fields.findIndex(v => v === "class");
+    const dateIndex = fields.findIndex(v => v === "date");
+    const beginIndex = fields.findIndex(v => v === "begin");
+    const endIndex = fields.findIndex(v => v === "end");
+    const roomsIndex = fields.findIndex(v => v === "rooms");
+
+    if (
+      classIndex === -1 ||
+      dateIndex === -1 ||
+      beginIndex === -1 ||
+      endIndex === -1 ||
+      roomsIndex === -1
+    ) {
+      ErrorHelper.invalidFileFormat();
+    }
+    for (const shift of data) {
+      if (
+        shift[classIndex] &&
+        shift[dateIndex] &&
+        shift[beginIndex] &&
+        shift[endIndex] &&
+        shift[roomsIndex]
+      ) {
+        const dateString = shift[dateIndex];
+        const beginString = shift[beginIndex];
+        const endString = shift[endIndex];
+        const classCode = shift[classIndex];
+        const rooms = shift[roomsIndex].split(";");
+        const classRecord = await ClassRepository.findOneLean({
+          code: classCode
+        });
+        if (!classRecord) {
+          continue;
+        }
+        const beginUnix = moment(
+          dateString + " " + beginString,
+          "DD-MM-YYYY HH:mm"
+        ).unix();
+        const endUnix = moment(
+          dateString + " " + endString,
+          "DD-MM-YYYY HH:mm"
+        ).unix();
+        const shiftData = {
+          class: classRecord._id,
+          beginAt: beginUnix,
+          endAt: endUnix
+        };
+        const shiftRecord = await Repository.create(shiftData);
+        if (!shiftRecord) {
+          continue;
+        }
+        for (const room of rooms) {
+          const roomRecord = await RoomRepository.findOneLean({ name: room });
+          if (roomRecord) {
+            const shiftRoomData = {
+              shift: shiftRecord._id,
+              room: roomRecord._id,
+              students: []
+            };
+            await ShiftRoomRepository.create(shiftRoomData);
+          }
+        }
+
+        updatedShift.push(shiftRecord);
+      }
+    }
+  }
+  return updatedShift;
+};
+
 const service = {
   find,
   findById,
   create,
   update,
-  deleteByID
+  deleteByID,
+  upload
 };
 
 export default service;

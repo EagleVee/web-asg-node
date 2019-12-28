@@ -1,6 +1,7 @@
 import Express from "express";
 import Service from "./ShiftService";
 import ResponseJSON from "../../../Config/ResponseJSON";
+import Upload from "../../Middleware/Multer";
 
 const Router = Express.Router();
 Router.get("/", async function(req, res) {
@@ -42,6 +43,15 @@ Router.put("/:id", async function(req, res) {
 Router.delete("/:id", async function(req, res) {
   try {
     const data = await Service.deleteByID(req.params.id);
+    res.status(200).send(ResponseJSON.success(data));
+  } catch (err) {
+    res.status(200).send(ResponseJSON.failed(err.message));
+  }
+});
+
+Router.post("/upload", Upload.single("file"), async function(req, res) {
+  try {
+    const data = await Service.upload(req);
     res.status(200).send(ResponseJSON.success(data));
   } catch (err) {
     res.status(200).send(ResponseJSON.failed(err.message));
