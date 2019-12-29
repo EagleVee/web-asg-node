@@ -1,4 +1,6 @@
-# Web Assignment - API - NodeJS
+# Web Assignment - API
+
+**NodeJS - MVC architecture - File Reader**
 
 ## How to Setup
 
