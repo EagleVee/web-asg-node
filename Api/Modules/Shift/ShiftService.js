@@ -35,7 +35,11 @@ const create = async data => {
     ErrorHelper.missingInput();
   }
 
-  const _data = await validateData(data);
+  const _data = await validateData(data, () => {});
+
+  if (!_data) {
+    return null;
+  }
 
   const shiftRecord = await Repository.create(_data);
 
@@ -115,7 +119,10 @@ const validateData = async (data, next) => {
   const classShifts = await Repository.findLean({ class: data.class });
   for (const shift of classShifts) {
     const { beginAt, endAt } = shift;
-    if (data.beginAt < endAt || data.endAt < beginAt) {
+    if (
+      (data.beginAt < endAt && data.endAt > endAt) ||
+      (data.beginAt < beginAt && data.endAt > beginAt )
+    ) {
       if (next) {
         next();
         return null;
