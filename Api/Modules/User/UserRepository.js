@@ -4,36 +4,47 @@ const UserSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     username: {
       type: String,
-      required: true
+      required: true,
     },
     password: {
       type: String,
-      required: true
+      required: true,
     },
-    studentId: {
-      type: String
-    },
-    role: {
+    email: {
       type: String,
       required: true,
-      default: "student"
-    }
+    },
+    school: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    googleId: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    facebookId: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   {
     timestamps: {
       createdAt: "createdAt",
-      updatedAt: "updatedAt"
-    }
-  }
+      updatedAt: "updatedAt",
+    },
+  },
 );
 
 const UserModel = mongoose.model("User", UserSchema);
 
-const find = async query => {
+const find = async (query) => {
   const { paginate, page, search } = query;
   let findQuery = UserModel.find({});
   if (search && search.length > 0) {
@@ -42,16 +53,16 @@ const find = async query => {
         {
           studentId: {
             $regex: search,
-            $options: "i"
-          }
+            $options: "i",
+          },
         },
         {
           name: {
             $regex: search,
-            $options: "i"
-          }
-        }
-      ]
+            $options: "i",
+          },
+        },
+      ],
     });
     delete query.search;
   }
@@ -66,27 +77,27 @@ const find = async query => {
   return findQuery;
 };
 
-const findOne = async query => {
+const findOne = async (query) => {
   return UserModel.findOne(query);
 };
 
-const findOneLean = async query => {
+const findOneLean = async (query) => {
   return UserModel.findOne(query).lean();
 };
 
-const count = async query => {
+const count = async (query) => {
   return UserModel.count(query);
 };
 
-const findById = async id => {
+const findById = async (id) => {
   return UserModel.findById(id);
 };
 
-const findByEmail = async email => {
+const findByEmail = async (email) => {
   return UserModel.findOne({ email: email });
 };
 
-const create = async data => {
+const create = async (data) => {
   const newDocument = new UserModel(data);
   return newDocument.save();
 };
@@ -95,11 +106,11 @@ const update = async (id, data) => {
   return UserModel.findByIdAndUpdate(id, { $set: data }, { new: true });
 };
 
-const deleteById = async id => {
+const deleteById = async (id) => {
   return UserModel.findByIdAndDelete(id);
 };
 
-const deleteMany = async query => {
+const deleteMany = async (query) => {
   return UserModel.deleteMany(query);
 };
 
@@ -113,7 +124,7 @@ const repository = {
   create,
   update,
   deleteById,
-  deleteMany
+  deleteMany,
 };
 
 export default repository;

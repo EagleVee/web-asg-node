@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 
 import UserRepository from "../User/UserRepository";
 import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
@@ -7,13 +7,12 @@ import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 import {
   JWT_SECRET,
   SECRET_KEY,
-  TOKEN_EXPIRE_MILLISECOND
 } from "../../../Config";
 import ResponseJSON from "../../../Config/ResponseJSON";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import HTTPException from "../../../Common/HTTPException";
 
-const login = async data => {
+const login = async (data) => {
   if (!data.username || !data.password) {
     ErrorHelper.missingInput();
   }
@@ -24,93 +23,66 @@ const login = async data => {
 
   const result = await bcrypt.compare(data.password, existedUser.password);
   if (result) {
-    const tokenData = {
-      _id: existedUser._id,
-      name: existedUser.name,
-      email: existedUser.email,
-      role: existedUser.role
-    };
-
-    const accessToken = await jwt.sign(tokenData, JWT_SECRET, {
-      expiresIn: "1 hours"
-    });
-
-    const refreshToken = await jwt.sign(tokenData, JWT_SECRET, {
-      expiresIn: "30 days"
-    });
-
-    return {
-      user: existedUser,
-      accessToken: accessToken,
-      refreshToken: refreshToken
-    };
+    return generateTokens({ id: existedUser._id });
   } else {
     throw new HTTPException(403, "You have entered wrong password!");
   }
 };
 
-const register = async data => {
-  if (!data.studentId || !data.password || !data.name) {
+const register = async (data) => {
+  const { password, email, google_id = "", facebook_id = "" } = data;
+  if (!password || !email) {
     ErrorHelper.missingInput();
   }
   const existedUser = await UserRepository.findByEmail(data.email);
   if (existedUser) {
-    throw new HTTPException(401, "An user with this email has already been registerd");
+    throw new HTTPException(
+      401,
+      "An user with this email has already been registerd",
+    );
   }
   const hashedPassword = await bcrypt.hash(data.password, SECRET_KEY);
-  return UserRepository.create({
-    name: data.name,
-    studentId: data.studentId,
-    password: hashedPassword
+  const user = await UserRepository.create({
+    email: email,
+    googleId: googleId,
+    facebookId: facebookId,
+    password: hashedPassword,
   });
-};
+  return generateTokens({ id: user._id });
+}
 
-const validateToken = async token => {
-  const existedToken = await AccessTokenRepository.findByToken(token);
-  console.log(existedToken);
-  if (!existedToken) {
-    throw new Error("Invalid token!");
-  }
-  if (existedToken.expireAt < Date.now()) {
-    return {
-      is_alive: false
-    };
-  }
-  existedToken.expireAt = Date.now() + TOKEN_EXPIRE_MILLISECOND;
-  return {
-    is_alive: true
-  };
-};
+const generateTokens = (params) => {
+  const accessToken = await jwt.sign(params, JWT_SECRET, {
+    expiresIn: "1 hours",
+  });
 
-const logoutToken = async token => {
-  const existedToken = await AccessTokenRepository.findByToken(token);
-  if (!existedToken) {
-    throw new Error("Invalid token!");
-  }
-  const newExpireDate = Date.now();
-  const newToken = await AccessTokenRepository.updateExpireAt(
-    token,
-    newExpireDate
-  );
+  const refreshToken = await jwt.sign(params, JWT_SECRET, {
+    expiresIn: "30 days",
+  });
+
   return {
-    loggedOut: true
-  };
+    accessToken,
+    refreshToken,
+  }
 };
 
 const authentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
-    const accessToken = AccessTokenRepository.findByToken(token);
-    if (!accessToken) {
-      res.status(200).send(ResponseJSON("Invalid token!"));
+    if (token && token.length > 0) {
+      const decoded = await verifyJwt(token);
+      const { id = "" } = decoded;
+      const user = await UserRepository.findOneLean({ _id: id});
+      if (user) {
+        req.user = user;
+        next();
+        return;
+      }
     }
-    if (accessToken.expireAt <= Date.now()) {
-      res.status(200).send(ResponseJSON("Token expired!"));
-    }
-    req.user = accessToken.user;
-    next();
+    
+    ErrorHelper.unauthenticated();
   } catch (err) {
-    res.status(200).send(ResponseJSON("Unauthenticated!"));
+    ErrorHelper.unauthenticated();
   }
 };
 
@@ -118,28 +90,37 @@ const authorization = (user, roles) => {
   return user && roles.indexOf(user.role) >= 0;
 };
 
-const me = async token => {
-  const accessTokenRecord = await AccessTokenRepository.findByToken(token);
-  if (!accessTokenRecord) {
-    ErrorHelper.unauthenticated();
+const refreshToken = async (token) => {
+  try {
+    const decoded = await verifyJwt(token);
+    return generateTokens(decoded);
+  } catch(err) {
+    if (err instanceof TokenExpiredError) {
+       throw new HTTPException(403, "Token has expired");
+    } else{
+      throw new HTTPException(403, "Invalid refresh token");
+    }
   }
+}
 
-  return UserRepository.findById(accessTokenRecord.user);
+const verifyJwt = (token) => {
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(decoded);
+      });
+    })
 };
-
-// const refreshToken = async (token) => {
-//   const newExpireDate = Date.now() + TOKEN_EXPIRE_MILLISECOND
-//   return AccessTokenRepository.updateExpireAt(token, newExpireDate)
-// }
 
 const service = {
   login,
   register,
   authentication,
   authorization,
-  validateToken,
-  logoutToken,
-  me
+  refreshToken,
+  verifyJwt,
 };
 
 export default service;

@@ -4,7 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import {
   MONGO_ATLAS_CONNECTION_STRING,
-  MONGO_CONNECTION_STRING
+  MONGO_CONNECTION_STRING,
 } from "./Config";
 import UserRouter from "./Api/Modules/User/UserRouter";
 import AuthRouter from "./Api/Modules/Auth/AuthRouter";
@@ -17,12 +17,12 @@ const mongoConnectionString =
 mongoose
   .connect(mongoConnectionString, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
   .then(() => {
     console.log("CONNECTED TO MONGODB");
   })
-  .catch(error => {
+  .catch((error) => {
     console.log(error);
   });
 

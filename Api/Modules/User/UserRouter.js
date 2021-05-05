@@ -51,13 +51,4 @@ Router.delete("/:id", async function (req, res) {
   }
 });
 
-Router.post("/upload", Upload.single("file"), async (req, res) => {
-  try {
-    const data = await Service.upload(req);
-    res.status(200).send(ResponseJSON.success(data));
-  } catch (err) {
-    ErrorHelper.handleError(res, err);
-  }
-});
-
 export default Router;

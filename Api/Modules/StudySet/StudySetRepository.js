@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 
 const StudySetSchema = mongoose.Schema(
-  {},
+  {
+    title: {
+      type: String,
+      required: false,
+      default: ""
+    }
+  },
   {
     timestamps: {
       createdAt: "createdAt",

@@ -7,15 +7,15 @@ import { SECRET_KEY } from "../../../Config";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import FieldHelper from "../../../Common/FieldHelper";
 
-const find = async query => {
+const find = async (query) => {
   return Repository.find(query);
 };
 
-const findById = async id => {
+const findById = async (id) => {
   return Repository.findById(id);
 };
 
-const create = async data => {
+const create = async (data) => {
   if (!data || !data.studentId) {
     ErrorHelper.missingInput();
   }
@@ -23,7 +23,7 @@ const create = async data => {
   return Repository.create(data);
 };
 
-const update = async function(id, data) {
+const update = async function (id, data) {
   const existedRecord = await Repository.findById(id);
   if (!existedRecord) {
     ErrorHelper.entityNotFound();
@@ -32,7 +32,7 @@ const update = async function(id, data) {
   return Repository.update(id, data);
 };
 
-const deleteByID = async id => {
+const deleteByID = async (id) => {
   const existedRecord = await Repository.findById(id);
   if (!existedRecord) {
     ErrorHelper.entityNotFound();
@@ -41,22 +41,17 @@ const deleteByID = async id => {
   return Repository.delete(id);
 };
 
-const validateEmail = email => {
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-};
-
-const findByToken = async jwtToken => {
+const findByToken = async (jwtToken) => {
   const token = await AccessTokenRepository.findByToken(jwtToken);
   return token.user;
 };
 
-const updateOrCreateStudent = async data => {
+const updateOrCreateStudent = async (data) => {
   if (!data || !data.studentId || !data.name || !data.password) {
     return null;
   }
   const existedRecord = await Repository.findOneLean({
-    studentId: data.studentId
+    studentId: data.studentId,
   });
   if (!existedRecord) {
     return Repository.create(data);
@@ -64,7 +59,7 @@ const updateOrCreateStudent = async data => {
   return Repository.update(existedRecord._id, data);
 };
 
-const upload = async data => {
+const upload = async (data) => {
   const { file } = data;
   if (!file) {
     ErrorHelper.missingFile();
@@ -74,10 +69,10 @@ const upload = async data => {
   for (const sheet of parsedFile) {
     const { data } = sheet;
     const fields = data.splice(0, 1)[0];
-    const studentIdIndex = fields.findIndex(v => v === "studentId");
-    const nameIndex = fields.findIndex(v => v === "name");
-    const passwordIndex = fields.findIndex(v => v === "password");
-    const roleIndex = fields.findIndex(v => v === "role");
+    const studentIdIndex = fields.findIndex((v) => v === "studentId");
+    const nameIndex = fields.findIndex((v) => v === "name");
+    const passwordIndex = fields.findIndex((v) => v === "password");
+    const roleIndex = fields.findIndex((v) => v === "role");
     if (
       studentIdIndex === -1 ||
       nameIndex === -1 ||
@@ -89,14 +84,14 @@ const upload = async data => {
     for (const student of data) {
       const hashedPassword = await bcrypt.hash(
         FieldHelper.checkWithRandom(student[passwordIndex]),
-        SECRET_KEY
+        SECRET_KEY,
       );
       const studentData = {
         username: FieldHelper.check(student[studentIdIndex]),
         studentId: FieldHelper.check(student[studentIdIndex]),
         name: FieldHelper.check(student[nameIndex]),
         password: hashedPassword,
-        role: FieldHelper.check(student[roleIndex], "student")
+        role: FieldHelper.check(student[roleIndex], "student"),
       };
       const studentRecord = await updateOrCreateStudent(studentData);
       if (studentRecord) {
@@ -114,7 +109,7 @@ const service = {
   create,
   update,
   deleteByID,
-  upload
+  upload,
 };
 
 export default service;

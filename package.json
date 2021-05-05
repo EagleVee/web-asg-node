@@ -39,5 +39,8 @@
     "node-xlsx": "^0.15.0",
     "nodemon": "^1.19.3",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
   }
 }
