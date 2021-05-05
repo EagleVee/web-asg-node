@@ -11,6 +11,7 @@ import {
 } from "../../../Config";
 import ResponseJSON from "../../../Config/ResponseJSON";
 import ErrorHelper from "../../../Common/ErrorHelper";
+import HTTPException from "../../../Common/HTTPException";
 
 const login = async data => {
   if (!data.username || !data.password) {
@@ -18,7 +19,7 @@ const login = async data => {
   }
   const existedUser = await UserRepository.findOne({ username: data.username });
   if (!existedUser) {
-    throw new Error("This email has not been registered!");
+    throw new HTTPException(401, "This email has not been registered!");
   }
 
   const result = await bcrypt.compare(data.password, existedUser.password);
@@ -31,23 +32,20 @@ const login = async data => {
     };
 
     const accessToken = await jwt.sign(tokenData, JWT_SECRET, {
-      expiresIn: "7 days"
+      expiresIn: "1 hours"
     });
 
-    const expireAt = Date.now() + TOKEN_EXPIRE_MILLISECOND;
-
-    const accessTokenRecord = await AccessTokenRepository.create({
-      user: existedUser._id,
-      jwtToken: accessToken,
-      expireAt: expireAt
+    const refreshToken = await jwt.sign(tokenData, JWT_SECRET, {
+      expiresIn: "30 days"
     });
 
     return {
       user: existedUser,
-      accessToken: accessToken
+      accessToken: accessToken,
+      refreshToken: refreshToken
     };
   } else {
-    throw new Error("You have entered wrong password!");
+    throw new HTTPException(403, "You have entered wrong password!");
   }
 };
 
@@ -57,7 +55,7 @@ const register = async data => {
   }
   const existedUser = await UserRepository.findByEmail(data.email);
   if (existedUser) {
-    throw new Error("USER EXISTED!");
+    throw new HTTPException(401, "An user with this email has already been registerd");
   }
   const hashedPassword = await bcrypt.hash(data.password, SECRET_KEY);
   return UserRepository.create({

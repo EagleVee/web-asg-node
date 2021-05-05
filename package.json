@@ -6,8 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec babel-node App.js",
-    "start-devtool": "nodemon --inspect --exec babel-node App.js",
-    "start-local": "ENVIRONMENT=local nodemon --exec babel-node App.js"
+    "start:devtool": "nodemon --inspect --exec babel-node App.js",
+    "start:local": "ENVIRONMENT=local nodemon --exec babel-node App.js",
+    "start:local:windows": "env:ENVIRONMENT=\"local\" nodemon --exec babel-node App.js",
+    "generate": "node FileGenerator.js"
   },
   "repository": {
     "type": "git",
@@ -21,8 +23,8 @@
   "homepage": "https://github.com/EagleVee/figello#readme",
   "dependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "bcrypt": "^3.0.6",
+    "babel-preset-env": "^1.7",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "concurrently": "^5.0.0",
     "cors": "^2.8.5",

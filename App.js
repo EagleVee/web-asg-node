@@ -8,17 +8,12 @@ import {
 } from "./Config";
 import UserRouter from "./Api/Modules/User/UserRouter";
 import AuthRouter from "./Api/Modules/Auth/AuthRouter";
-import RoomRouter from "./Api/Modules/Room/RoomRouter";
-import ClassRouter from "./Api/Modules/Class/ClassRouter";
-import ShiftRouter from "./Api/Modules/Shift/ShiftRouter";
-import ShiftRoomRouter from "./Api/Modules/ShiftRoom/ShiftRoomRouter";
-import ClassStudentRouter from "./Api/Modules/ClassStudent/ClassStudentRouter";
 
 export const PORT = process.env.PORT || 5000;
 const mongoConnectionString =
   process.env.ENVIRONMENT === "local"
     ? MONGO_CONNECTION_STRING
-    : MONGO_ATLAS_CONNECTION_STRING;
+    : MONGO_CONNECTION_STRING;
 mongoose
   .connect(mongoConnectionString, {
     useNewUrlParser: true,
@@ -37,13 +32,8 @@ app.use(cors());
 app.use(BodyParser.json());
 app.use("/api/user", UserRouter);
 app.use("/api/auth", AuthRouter);
-app.use("/api/room", RoomRouter);
-app.use("/api/shift", ShiftRouter);
-app.use("/api/shift-room", ShiftRoomRouter);
-app.use("/api/class", ClassRouter);
-app.use("/api/class-student", ClassStudentRouter);
 
-const server = app.listen(PORT, function() {
+const server = app.listen(PORT, function () {
   console.log(`Server run at localhost:${PORT}`);
 });
 

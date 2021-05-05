@@ -8,6 +8,7 @@ const create = async data => {
 
   return Repository.create(data);
 };
+
 const service = {
   create
 };
