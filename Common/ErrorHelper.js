@@ -1,11 +1,11 @@
 import HTTPException from "./HTTPException";
-import ResponseJSON from "../Config/ResponseJSON"
+import ResponseJSON from "../Config/ResponseJSON";
 export default class ErrorHelper {
   static unauthenticated() {
-    throw new HTTPException(401, "Bạn không có quyền truy cập");
+    throw new HTTPException(403, "Unauthenticated");
   }
   static missingInput() {
-    throw new HTTPException(400, "Thiếu thông tin");
+    throw new HTTPException(400, "Missing input");
   }
 
   static notExisted() {
@@ -13,22 +13,14 @@ export default class ErrorHelper {
   }
 
   static entityNotFound() {
-    throw new HTTPException(400, "Không tìm thấy");
-  }
-
-  static missingFile() {
-    throw new HTTPException(400, "Thiếu file");
-  }
-
-  static invalidFileFormat() {
-    throw new HTTPException(400, "Định dạng file không đúng");
+    throw new HTTPException(400, "Entity not found");
   }
 
   static handleError(res, error) {
     if (error instanceof HTTPException) {
       res.status(error.statusCode).send(ResponseJSON.failed(error.message));
     } else {
-      res.status(400).send(ResponseJSON.failed(error.message))
+      res.status(400).send(ResponseJSON.failed(error.message));
     }
   }
 }

@@ -2,15 +2,12 @@ import bcrypt from "bcrypt";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 
 import UserRepository from "../User/UserRepository";
-import AccessTokenRepository from "../AccessToken/AccessTokenRepository";
 
-import {
-  JWT_SECRET,
-  SECRET_KEY,
-} from "../../../Config";
+import { JWT_SECRET, SECRET_KEY } from "../../../Config";
 import ResponseJSON from "../../../Config/ResponseJSON";
 import ErrorHelper from "../../../Common/ErrorHelper";
 import HTTPException from "../../../Common/HTTPException";
+import { verifyJwt } from "../../../Common/JwtHelper";
 
 const login = async (data) => {
   if (!data.username || !data.password) {
@@ -30,7 +27,7 @@ const login = async (data) => {
 };
 
 const register = async (data) => {
-  const { password, email, google_id = "", facebook_id = "" } = data;
+  const { password, email, googleId = "", facebookId = "" } = data;
   if (!password || !email) {
     ErrorHelper.missingInput();
   }
@@ -49,41 +46,21 @@ const register = async (data) => {
     password: hashedPassword,
   });
   return generateTokens({ id: user._id });
-}
+};
 
 const generateTokens = (params) => {
-  const accessToken = await jwt.sign(params, JWT_SECRET, {
+  const accessToken = jwt.sign(params, JWT_SECRET, {
     expiresIn: "1 hours",
   });
 
-  const refreshToken = await jwt.sign(params, JWT_SECRET, {
+  const refreshToken = jwt.sign(params, JWT_SECRET, {
     expiresIn: "30 days",
   });
 
   return {
     accessToken,
     refreshToken,
-  }
-};
-
-const authentication = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization;
-    if (token && token.length > 0) {
-      const decoded = await verifyJwt(token);
-      const { id = "" } = decoded;
-      const user = await UserRepository.findOneLean({ _id: id});
-      if (user) {
-        req.user = user;
-        next();
-        return;
-      }
-    }
-    
-    ErrorHelper.unauthenticated();
-  } catch (err) {
-    ErrorHelper.unauthenticated();
-  }
+  };
 };
 
 const authorization = (user, roles) => {
@@ -93,34 +70,21 @@ const authorization = (user, roles) => {
 const refreshToken = async (token) => {
   try {
     const decoded = await verifyJwt(token);
-    return generateTokens(decoded);
-  } catch(err) {
+    return generateTokens({ id: decoded.id });
+  } catch (err) {
     if (err instanceof TokenExpiredError) {
-       throw new HTTPException(403, "Token has expired");
-    } else{
-      throw new HTTPException(403, "Invalid refresh token");
+      throw new HTTPException(401, "Token has expired");
+    } else {
+      throw new HTTPException(401, "Invalid refresh token");
     }
   }
-}
-
-const verifyJwt = (token) => {
-    return new Promise((resolve, reject) => {
-      jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(decoded);
-      });
-    })
 };
 
 const service = {
   login,
   register,
-  authentication,
   authorization,
   refreshToken,
-  verifyJwt,
 };
 
 export default service;

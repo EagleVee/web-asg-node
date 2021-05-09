@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const repositoryContent = fileName => {
+const repositoryContent = (fileName) => {
   return `import mongoose from "mongoose";
 
   const ${fileName}Schema = mongoose.Schema(
@@ -80,7 +80,6 @@ const repositoryContent = fileName => {
     findOne,
     findOneLean,
     findById,
-    findByEmail,
     count,
     create,
     update,
@@ -91,7 +90,7 @@ const repositoryContent = fileName => {
   export default repository;`;
 };
 
-const serviceContent = fileName => {
+const serviceContent = (fileName) => {
   return `import Repository from "./${fileName}Repository";
   import ErrorHelper from "../../../Common/ErrorHelper";
   import FieldHelper from "../../../Common/FieldHelper";
@@ -145,9 +144,9 @@ const serviceContent = fileName => {
   
   export default service;
   `;
-}
+};
 
-const routerContent = fileName => {
+const routerContent = (fileName) => {
   return `import Express from "express";
   import Service from "./${fileName}Service";
   import ResponseJSON from "../../../Config/ResponseJSON";
@@ -201,7 +200,7 @@ const routerContent = fileName => {
   });
   
   export default Router;`;
-}
+};
 
 function createModule(fileName) {
   let dirPath = `Api/Modules/${fileName}`;
@@ -212,7 +211,11 @@ function createModule(fileName) {
   const repositoryPath = dirPath + `/${fileName}Repository.js`;
   const servicePath = dirPath + `/${fileName}Service.js`;
   const routerPath = dirPath + `/${fileName}Router.js`;
-  if (fs.existsSync(repositoryPath) || fs.existsSync(servicePath) || fs.existsSync(routerPath)) {
+  if (
+    fs.existsSync(repositoryPath) ||
+    fs.existsSync(servicePath) ||
+    fs.existsSync(routerPath)
+  ) {
     throw new Error("File existed!");
   } else {
     const repository = repositoryContent(fileName);

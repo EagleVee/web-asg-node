@@ -32,3 +32,5 @@ Router.post("/token/refresh", async (req, res) => {
     ErrorHelper.handleError(res, err);
   }
 });
+
+export default Router;

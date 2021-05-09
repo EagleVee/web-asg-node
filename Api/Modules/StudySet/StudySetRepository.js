@@ -4,21 +4,38 @@ const StudySetSchema = mongoose.Schema(
   {
     title: {
       type: String,
+      required: true,
+      default: "",
+    },
+    description: {
+      type: String,
       required: false,
-      default: ""
-    }
+      default: "",
+    },
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      default: null,
+      ref: "UserModel",
+    },
+    folderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      default: null,
+      ref: "FolderModel",
+    },
   },
   {
     timestamps: {
       createdAt: "createdAt",
-      updatedAt: "updatedAt"
-    }
-  }
+      updatedAt: "updatedAt",
+    },
+  },
 );
 
 const StudySetModel = mongoose.model("StudySet", StudySetSchema);
 
-const find = async query => {
+const find = async (query) => {
   const { paginate, page, search } = query;
   let findQuery = StudySetModel.find({});
   if (search && search.length > 0) {
@@ -27,10 +44,10 @@ const find = async query => {
         {
           title: {
             $regex: search,
-            $options: "i"
-          }
+            $options: "i",
+          },
         },
-      ]
+      ],
     });
     delete query.search;
   }
@@ -39,29 +56,29 @@ const find = async query => {
     const skip = (Number(page) - 1) * Number(paginate);
     delete query.paginate;
     delete query.page;
-    return findQuery.find(query).limit(limit).skip(skip);
+    findQuery = findQuery.find(query).limit(limit).skip(skip);
   }
 
   return findQuery;
 };
 
-const findOne = async query => {
+const findOne = async (query) => {
   return StudySetModel.findOne(query);
 };
 
-const findOneLean = async query => {
+const findOneLean = async (query) => {
   return StudySetModel.findOne(query).lean();
 };
 
-const count = async query => {
+const count = async (query) => {
   return StudySetModel.count(query);
 };
 
-const findById = async id => {
+const findById = async (id) => {
   return StudySetModel.findById(id);
 };
 
-const create = async data => {
+const create = async (data) => {
   const newDocument = new StudySetModel(data);
   return newDocument.save();
 };
@@ -70,11 +87,11 @@ const update = async (id, data) => {
   return StudySetModel.findByIdAndUpdate(id, { $set: data }, { new: true });
 };
 
-const deleteById = async id => {
+const deleteById = async (id) => {
   return StudySetModel.findByIdAndDelete(id);
 };
 
-const deleteMany = async query => {
+const deleteMany = async (query) => {
   return StudySetModel.deleteMany(query);
 };
 
@@ -83,12 +100,11 @@ const repository = {
   findOne,
   findOneLean,
   findById,
-  findByEmail,
   count,
   create,
   update,
   deleteById,
-  deleteMany
+  deleteMany,
 };
 
 export default repository;

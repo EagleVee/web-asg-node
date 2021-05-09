@@ -4,11 +4,8 @@ const UserSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-    },
-    username: {
-      type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     password: {
       type: String,

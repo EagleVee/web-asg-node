@@ -1,15 +1,14 @@
 import Express from "express";
-import Upload from "../../Middleware/Multer";
 import Service from "./UserService";
+import Authentication from "../../Middleware/Authentication";
 import ResponseJSON from "../../../Config/ResponseJSON";
 import ErrorHelper from "../../../Common/ErrorHelper";
 
 const Router = Express.Router();
 
-Router.get("/", async function (req, res) {
+Router.get("/", Authentication, async function (req, res) {
   try {
-    const data = await Service.find(req.query);
-    res.status(200).send(ResponseJSON.success(data));
+    res.status(200).send(ResponseJSON.success(req.user));
   } catch (err) {
     ErrorHelper.handleError(res, err);
   }
